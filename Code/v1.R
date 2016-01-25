@@ -1,3 +1,4 @@
+library(class)
 train <- read.csv("../DATA/news_popularity_training.csv", sep = ",")
 
 #tables
@@ -25,7 +26,7 @@ train.testLabels <- train[ind==2, 62]
 
 
 
-library(class)
+
 #kkn
 train_pred <- knn(train = train.training, test = train.test, cl = train.trainLabels, k=3)
 
