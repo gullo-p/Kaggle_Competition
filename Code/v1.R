@@ -1,4 +1,4 @@
-train <- read.csv("news_popularity_training.csv", sep = ",")
+train <- read.csv("../DATA/news_popularity_training.csv", sep = ",")
 
 #tables
 table(train$popularity)
@@ -15,7 +15,7 @@ train_norm <- as.data.frame(lapply(train[4:61], normalize))
 train_norm <- cbind(train[1:3],train_norm,train$popularity)
 
 
-
+?sample
 #Sample
 ind <- sample(2, nrow(train), replace=TRUE, prob=c(0.67, 0.33))
 train.training <- train[ind==1, 1:61]
@@ -25,5 +25,9 @@ train.testLabels <- train[ind==2, 62]
 
 
 
+library(class)
 #kkn
 train_pred <- knn(train = train.training, test = train.test, cl = train.trainLabels, k=3)
+
+?knn
+iris3[,,2]
