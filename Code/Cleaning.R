@@ -1,7 +1,6 @@
-setwd("/Users/santhoshnarayanan/Documents/Semester_2/15D012_dv_Computational_Methods/Kaggle_Competition/Kaggle_Competition/Data")
 
-train <- read.csv("news_popularity_training.csv", sep = ",")
-test <- read.csv("news_popularity_test.csv", sep = ",")
+train <- read.csv("../DATA/news_popularity_training.csv", sep = ",")
+test <- read.csv("../DATA/news_popularity_test.csv", sep = ",")
 test$popularity <- NA
 
 dataset <- rbind(train,test)

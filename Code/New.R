@@ -1,16 +1,20 @@
 if(!require("class")) install.packages("class"); library(class)
-if(!require("chron")) install.packages("chron"); library(chron)
+if(!require("HotDeckImputation")) install.packages("HotDeckImputation"); library(HotDeckImputation)
 
 #get the data
 train <- read.csv("../DATA/news_popularity_training.csv", sep = ",")
 test <- read.csv("../DATA/news_popularity_test.csv", sep = ",")
 
-#tables
-table(train$popularity)
-round(prop.table(table(train$popularity)) * 100, digits = 1)
+
+test$popularity <- NA
+
+dataset <- rbind(train,test)
+
+features <- dataset[,c(2,4:61)]
+labels <- as.factor(dataset$popularity)
 
 ###############################################################
-##DATA MANIPULATION
+##DATA MANIPULATION & CLEANING
 
 #transform number of images & videos into 3-categorical variables (0, 1 or more than 1)
 three.cat <- function(x){
@@ -22,16 +26,47 @@ three.cat <- function(x){
   return(x)
 }
 
-train$num_imgs <- three.cat(train$num_imgs)
-train$num_videos <- three.cat(train$num_videos)
+features$num_imgs <- three.cat(features$num_imgs)
+features$num_videos <- three.cat(features$num_videos)
 
 
-#Remove non-sense or redundant features: n-non-stop-words, rate negative_words, abs_title_sent_polarity
-train_clean <- train[,-c(7,51,61) ] 
+#Remove non-sense or redundant features: 
 
-test_clean <- test[, -c(7,51,61) ]
+# Remove the constant column
+features$n_non_stop_words <- NULL
 
+# Remove the rate negative_words
+features$rate_negative_words <- NULL
 
+# # Remove the ukrain outlier
+# features <- features[-which(features$n_unique_tokens > 1),]
+# labels <- labels[-which(dataset$n_unique_tokens > 1)]
+
+# Recode the missing values
+features$n_unique_tokens[features$n_tokens_content == 0] <- NA
+features$n_non_stop_unique_tokens[features$n_tokens_content == 0] <- NA
+features$num_hrefs[features$n_tokens_content == 0] <- NA
+features$num_self_hrefs[features$n_tokens_content == 0] <- NA
+features$average_token_length[features$n_tokens_content == 0] <- NA
+features$n_tokens_content[features$n_tokens_content == 0] <- NA
+
+# Recode the missing values
+features$global_sentiment_polarity[features$global_subjectivity == 0] <- NA
+features$global_rate_positive_words[features$global_subjectivity == 0] <- NA
+features$global_rate_negative_words[features$global_subjectivity == 0] <- NA
+features$rate_positive_words[features$global_subjectivity == 0] <- NA
+features$avg_positive_polarity[features$global_subjectivity == 0] <- NA
+features$avg_negative_polarity[features$global_subjectivity == 0] <- NA
+features$min_positive_polarity[features$global_subjectivity == 0] <- NA
+features$min_negative_polarity[features$global_subjectivity == 0] <- NA
+features$max_positive_polarity[features$global_subjectivity == 0] <- NA
+features$max_negative_polarity[features$global_subjectivity == 0] <- NA
+features$global_subjectivity[features$global_subjectivity == 0] <- NA
+
+# Hot deck Imputation
+imp.features <- impute.NN_HD(DATA=features[,-1],distance="eukl")
+
+imp.features <- data.frame(url = features$url, imp.features)
 
 #obtain date & holiday variables
 #New years, Martin Luther, Washington's Birthday, Memorial day, Independence, labor, Columbus
@@ -45,15 +80,15 @@ obtain.date <- function(dataset){
             "2014-12-25")
    myholidays  <- as.Date(dates,format ="%Y-%m-%d")
 
-  year <- sapply(dataset$url, FUN=function(x) {as.numeric(substring(x, 21,24))})
-  month <- sapply(dataset$url, FUN=function(x) {as.numeric(substring(x, 26,27))})
-  day <- sapply(dataset$url, FUN=function(x) {as.numeric(substring(x, 29,30))})
+  year <- as.numeric(substring(dataset$url, 21,24))
+  month <- as.numeric(substring(dataset$url, 26,27))
+  day <- as.numeric(substring(dataset$url, 29,30))
   date <- paste(year,month,day, sep = "-")
   date <- as.Date(date)
   is_holiday <- rep(0,length(year))
   is_holiday[which(date %in% myholidays)] <- 1
   
-  a <- as.data.frame(cbind(year,month, day, date = as.character(date), is_holiday))
+  a <- data.frame(year = year,month = month, day = day, date = as.character(date), is_holiday = as.numeric(is_holiday))
   
   return(a)
 
@@ -61,15 +96,14 @@ obtain.date <- function(dataset){
 
 
 #obtain dates for training set
-obtained.info <- obtain.date(train_clean)
+obtained.info <- obtain.date(imp.features)
 
 
 #append the new created features
-train_clean <- cbind(train_clean[,-59], obtained.info$year, obtained.info$month, 
-                     obtained.info$is_holiday, train_clean$popularity)
+imp.features <- data.frame(imp.features, year = obtained.info$year,month = obtained.info$month, 
+                    is_holiday = obtained.info$is_holiday)
 
-
-
+imp.features$url <- NULL
 ######Standardization of the features
 #standardize the continuous features
 standardize <- function(x) {
@@ -80,22 +114,24 @@ standardize <- function(x) {
 
 #categorical standardization
 cat_stand <- function(x){
-  num <- x - 1/2
-  denom <- length(unique(x))
+  num <- x - min(x)
+  denom <- max(x)-min(x)
   return(num/denom)
 }
 
 
 #apply the changes (to be corrected)
-train_stand1 <- as.data.frame(lapply(train[3:14], standardize))
-train_stand2 <- as.data.frame(lapply(train[15:20], cat_stand))
-train_stand3 <- as.data.frame(lapply(train[21:32], standardize))
-train_stand4 <- as.data.frame(lapply(train[33:40], cat_stand))
-train_stand5 <- as.data.frame(lapply(train[41:61], standardize))
-train_stand <- cbind(train_stand1, train_stand2, train_stand3, train_stand4, train_stand5)
+features.con <- apply(imp.features[,c(1:10,17:28,37:56)],2,standardize)
+features.dis <- apply(imp.features[,-c(1:10,17:28,37:56)],2,cat_stand)
 
+features_clean <- data.frame(features.con, features.dis)
 
+real_train_pred <- knn(train=features_clean[1:29999,], test = features_clean[30000:39643,], cl = labels[1:29999], k=20)
+real_train_pred <- knn(train=features_clean[1:30000,], test = features_clean[30001:39643,], cl = labels[1:30000], k=20)
+real_train_pred <- as.data.frame(real_train_pred)
 
+final <- read.csv("/Users/guglielmo/Desktop/Final/final.csv", header = TRUE, sep = ",")
+sum(real_train_pred == final$popularity )/9644
 
 ####################
 #FEATURE SELECTION
@@ -128,14 +164,6 @@ sum(result$train_pred == train.testLabels)/10008
 
 test_stand <- as.data.frame(lapply(test[4:61], standardize))
 
-#obtain year and month from url
-test$year <- sapply(test$url, FUN=function(x) {as.numeric(substring(x, 21,24))})
-test$month <- sapply(test$url, FUN=function(x) {as.numeric(substring(x, 26,27))})
-test$day <- sapply(test$url, FUN=function(x) {as.numeric(substring(x, 29,30))})
-test$date <- dates(paste(test$year,test$month,test$day, sep = "-"), format="Y-M-D")
-test$is_holiday <- is.holiday(as.Date(test$date),myholidays)
-
-test_stand <- cbind(test[1:3],test_stand , test$year , test$month, test$is_holiday)
 
 #real test to submit
 real_train_pred <- knn(train=train_stand[,3:64], test = test_stand[,3:64], cl = train_stand[,65], k=20)
