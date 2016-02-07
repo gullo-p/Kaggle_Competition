@@ -1,4 +1,7 @@
+install.packages("chron")
+library(chron)
 library(class)
+?is.holiday
 train <- read.csv("../DATA/news_popularity_training.csv", sep = ",")
 test <- read.csv("../DATA/news_popularity_test.csv", sep = ",")
 

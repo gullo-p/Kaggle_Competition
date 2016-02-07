@@ -1,4 +1,5 @@
-library(class)
+if(!require("class")) install.packages("class"); library(class)
+if(!require("chron")) install.packages("chron"); library(chron)
 
 #get the data
 train <- read.csv("../DATA/news_popularity_training.csv", sep = ",")
@@ -11,6 +12,62 @@ round(prop.table(table(train$popularity)) * 100, digits = 1)
 ###############################################################
 ##DATA MANIPULATION
 
+#transform number of images & videos into 3-categorical variables (0, 1 or more than 1)
+three.cat <- function(x){
+  
+  for(i in 1:length(x)){
+    if(x[i] > 2) x[i] <- 2
+    
+  }
+  return(x)
+}
+
+train$num_imgs <- three.cat(train$num_imgs)
+train$num_videos <- three.cat(train$num_videos)
+
+
+#Remove non-sense or redundant features: n-non-stop-words, rate negative_words, abs_title_sent_polarity
+train_clean <- train[,-c(7,51,61) ] 
+
+test_clean <- test[, -c(7,51,61) ]
+
+
+
+#obtain date & holiday variables
+#New years, Martin Luther, Washington's Birthday, Memorial day, Independence, labor, Columbus
+#Veterans, Thanksgiving, Christmas
+
+obtain.date <- function(dataset){
+  myholidays  <- as.Date(c("2013-01-01","2013-01-21","2013-02-18" , "2013-05-27", "2013-07-04", 
+                       "2013-09-02", "2013-10-14", "2013-11-11", "2013-11-28", 
+                       "2013-12-25", "2014-01-01", "2014-01-20", "2014-02-17", "2014-05-26", 
+                       "2014-07-04", "2014-09-01", "2014-10-13", "2014-11-11", "2014-11-27" ,
+                       "2014-12-25"))
+
+  year <- sapply(dataset$url, FUN=function(x) {as.numeric(substring(x, 21,24))})
+  month <- sapply(dataset$url, FUN=function(x) {as.numeric(substring(x, 26,27))})
+  day <- sapply(dataset$url, FUN=function(x) {as.numeric(substring(x, 29,30))})
+  date <- paste(year,month,day, sep = "-")
+  date <- as.Date(date)
+  is_holiday <- is.holiday(date,myholidays)
+  
+  a <- as.data.frame(cbind(year,month, day, date, is_holiday))
+  
+  return(a)
+
+}
+?is.holiday
+#obtain dates for training set
+obtained.info <- obtain.date(train_clean)
+
+
+#append the new created features
+train_clean <- cbind(train_clean[,-59], obtained.info$year, obtained.info$month, 
+                     obtained.info$is_holiday, train_clean$popularity)
+
+
+
+######Standardization of the features
 #standardize the continuous features
 standardize <- function(x) {
   num <- x - mean(x)
@@ -26,27 +83,14 @@ cat_stand <- function(x){
 }
 
 
+#apply the changes (to be corrected)
+train_stand1 <- as.data.frame(lapply(train[3:14], standardize))
+train_stand2 <- as.data.frame(lapply(train[15:20], cat_stand))
+train_stand3 <- as.data.frame(lapply(train[21:32], standardize))
+train_stand4 <- as.data.frame(lapply(train[33:40], cat_stand))
+train_stand5 <- as.data.frame(lapply(train[41:61], standardize))
+train_stand <- cbind(train_stand1, train_stand2, train_stand3, train_stand4, train_stand5)
 
-#apply the changes
-train_stand <- as.data.frame(lapply(train[4:61], standardize))
-
-#obtain date & holiday variables
-#New years, Martin Luther, Washington's Birthday, Memorial day, Independence, labor, Columbus
-#Veterans, Thanksgiving, Christmas
-myholidays  <- dates(c("2013-01-01","2013-01-21","2013-02-18" , "2013-05-27", "2013-07-04", 
-                       "2013-09-02", "2013-10-14", "2013-11-11", "2013-11-28", 
-                       "2013-12-25", "2014-01-01", "2014-01-20", "2014-02-17", "2014-05-26", 
-                       "2014-07-04", "2014-09-01", "2014-10-13", "2014-11-11", "2014-11-27" ,
-                       "2014-12-25"), format="Y-M-D")
-
-train$year <- sapply(train$url, FUN=function(x) {as.numeric(substring(x, 21,24))})
-train$month <- sapply(train$url, FUN=function(x) {as.numeric(substring(x, 26,27))})
-train$day <- sapply(train$url, FUN=function(x) {as.numeric(substring(x, 29,30))})
-train$date <- dates(paste(train$year,train$month,train$day, sep = "-"), format="Y-M-D")
-train$is_holiday <- is.holiday(as.Date(train$date),myholidays)
-
-train_stand <- cbind(train$id, train$url, train$timedelta,train_stand,train$year, train$month, 
-                     train$is_holiday, train$popularity)
 
 
 
