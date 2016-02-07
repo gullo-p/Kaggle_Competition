@@ -38,25 +38,28 @@ test_clean <- test[, -c(7,51,61) ]
 #Veterans, Thanksgiving, Christmas
 
 obtain.date <- function(dataset){
-  myholidays  <- as.Date(c("2013-01-01","2013-01-21","2013-02-18" , "2013-05-27", "2013-07-04", 
-                       "2013-09-02", "2013-10-14", "2013-11-11", "2013-11-28", 
-                       "2013-12-25", "2014-01-01", "2014-01-20", "2014-02-17", "2014-05-26", 
-                       "2014-07-04", "2014-09-01", "2014-10-13", "2014-11-11", "2014-11-27" ,
-                       "2014-12-25"))
+  dates = c("2013-01-01","2013-01-21","2013-02-18" , "2013-05-27", "2013-07-04", 
+            "2013-09-02", "2013-10-14", "2013-11-11", "2013-11-28", 
+            "2013-12-25", "2014-01-01", "2014-01-20", "2014-02-17", "2014-05-26", 
+            "2014-07-04", "2014-09-01", "2014-10-13", "2014-11-11", "2014-11-27" ,
+            "2014-12-25")
+   myholidays  <- as.Date(dates,format ="%Y-%m-%d")
 
   year <- sapply(dataset$url, FUN=function(x) {as.numeric(substring(x, 21,24))})
   month <- sapply(dataset$url, FUN=function(x) {as.numeric(substring(x, 26,27))})
   day <- sapply(dataset$url, FUN=function(x) {as.numeric(substring(x, 29,30))})
   date <- paste(year,month,day, sep = "-")
   date <- as.Date(date)
-  is_holiday <- is.holiday(date,myholidays)
+  is_holiday <- rep(0,length(year))
+  is_holiday[which(date %in% myholidays)] <- 1
   
-  a <- as.data.frame(cbind(year,month, day, date, is_holiday))
+  a <- as.data.frame(cbind(year,month, day, date = as.character(date), is_holiday))
   
   return(a)
 
 }
-?is.holiday
+
+
 #obtain dates for training set
 obtained.info <- obtain.date(train_clean)
 
@@ -95,7 +98,7 @@ train_stand <- cbind(train_stand1, train_stand2, train_stand3, train_stand4, tra
 
 
 ####################
-#FEATURE EXTRACTION
+#FEATURE SELECTION
 
 
 
