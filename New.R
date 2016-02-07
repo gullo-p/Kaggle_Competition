@@ -75,13 +75,13 @@ write.csv(submit, file = "submit4.csv", quote = FALSE, row.names = FALSE)
 
 
 ---------------------------------
-
-#STANDARDIZED VERSION  +  YEAR AND MONTH (THE ONE WHO WORKED BEST)
-standardize <- function(x) {
-  num <- x - mean(x)
-  denom <-sd(x)
-  return (num/denom)
-}
+  
+  #STANDARDIZED VERSION  +  YEAR AND MONTH (THE ONE WHO WORKED BEST)
+  standardize <- function(x) {
+    num <- x - mean(x)
+    denom <-sd(x)
+    return (num/denom)
+  }
 
 train_stand <- as.data.frame(lapply(train[4:61], standardize))
 
