@@ -1,17 +1,18 @@
 if(!require("class")) install.packages("class"); library(class)
 if(!require("HotDeckImputation")) install.packages("HotDeckImputation"); library(HotDeckImputation)
-
+#install.packages("glmnet")
+#install.packages("lars")
+library(glmnet)
+library(lars)
 #get the data
 train <- read.csv("../DATA/news_popularity_training.csv", sep = ",")
 test <- read.csv("../DATA/news_popularity_test.csv", sep = ",")
-
 
 test$popularity <- NA
 
 dataset <- rbind(train,test)
 
-features <- dataset[,c(2,4:61)]
-labels <- as.factor(dataset$popularity)
+features <- dataset[,-which(colnames(dataset) %in% c("popularity"))]
 
 ###############################################################
 ##DATA MANIPULATION & CLEANING
@@ -64,7 +65,7 @@ features$max_negative_polarity[features$global_subjectivity == 0] <- NA
 features$global_subjectivity[features$global_subjectivity == 0] <- NA
 
 # Hot deck Imputation
-imp.features <- impute.NN_HD(DATA=features[,-1],distance="eukl")
+imp.features <- impute.NN_HD(DATA=features[,-c(1:3)],distance="eukl")
 
 imp.features <- data.frame(url = features$url, imp.features)
 
@@ -121,8 +122,8 @@ cat_stand <- function(x){
 
 
 #apply the changes (to be corrected)
-features.con <- apply(imp.features[,c(1:10,17:28,37:56)],2,standardize)
-features.dis <- apply(imp.features[,-c(1:10,17:28,37:56)],2,cat_stand)
+features.con <- apply(imp.features[,c(1:6,9:10,17:28,37:56)],2,standardize)
+features.dis <- apply(imp.features[,-c(1:6,9:10,17:28,37:56)],2,cat_stand)
 
 features_clean <- data.frame(features.con, features.dis)
 
@@ -130,18 +131,55 @@ real_train_pred <- knn(train=features_clean[1:29999,], test = features_clean[300
 real_train_pred <- knn(train=features_clean[1:30000,], test = features_clean[30001:39643,], cl = labels[1:30000], k=20)
 real_train_pred <- as.data.frame(real_train_pred)
 
-final <- read.csv("/Users/guglielmo/Desktop/Final/final.csv", header = TRUE, sep = ",")
+final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
 sum(real_train_pred == final$popularity )/9644
 
 ####################
 #FEATURE SELECTION
 
+train.clean <- data.frame(features_clean,popularity = as.numeric(dataset$popularity))[1:30000,]
+#Split into popular and not popular
+train.clean$dummy[train.clean$popularity < 3] <- 0
+train.clean$dummy[train.clean$popularity > 2] <- 1
 
+fisher.rank <- function(feature,label){
+  num <- (mean(feature[label == 0]) - mean(feature[label == 1]))^2
+  denom <- var(feature[label == 0]) + var(feature[label == 1])
+  rank <- round(num/denom,4)
+  return(rank)
+}
 
+X = train.clean[,-which(colnames(train.clean) %in% c("popularity","dummy"))]
+fisher.score = apply(X,2,function(x)fisher.rank(x,train.clean$dummy))
+names(fisher.score) = colnames(X)
 
+top.ranks = fisher.score[order(fisher.score,decreasing = T)]
+top.vars = names(top.ranks[1:40])
 
+train.clean = train.clean[,which(colnames(train.clean) %in% c(top.vars,"popularity"))]
+test.clean = features_clean[30001:39644,which(colnames(train.clean) %in% top.vars)]
 
+real_train_pred <- knn(train=train.clean[,-41], test = test.clean, cl = train.clean$popularity, k=20)
+real_train_pred <- as.data.frame(real_train_pred)
 
+final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
+sum(real_train_pred == final$popularity )/9644
+#######################################################################
+train.clean <- data.frame(features_clean,popularity = as.numeric(dataset$popularity))[1:30000,]
+test.clean <- as.matrix(features_clean[-c(1:30000),])
+
+X <- as.matrix(train.clean[,-60])
+y <- as.factor(train.clean$popularity)
+lasso.model <- glmnet(x = X, y = y ,family="multinomial", type.multinomial = "grouped")
+s = min(lasso.model$lambda)
+pfit = predict(lasso.model,test.clean,s=s,type="class")
+
+cvfit = cv.glmnet(X, y, family="multinomial", type.multinomial = "grouped", parallel = TRUE)
+
+predict(cvfit, newx = x[1:10,], s = "lambda.min", type = "class")
+
+final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
+sum(pfit == final$popularity )/9644
 ####################
 #CROSS VALIDATION
 
