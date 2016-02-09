@@ -1,0 +1,10 @@
+Package: MedMast
+Type: Package
+Title: Predicting news popularity
+Version: 0.1
+Date: 2016-02-10
+Author: Anna Corretger, Guglielmo Pelino, Santhosh Narayanan
+Maintainer: Guglielmo Pelino <guglielmo.pelino@barcelonagse.eu>
+Description: This package wraps up the computations for the Machine Learning competition on Kaggle by the group Mediterranean Masterminds.
+License: NA
+LazyData: TRUE

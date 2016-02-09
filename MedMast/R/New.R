@@ -1,11 +1,14 @@
 if(!require("class")) install.packages("class"); library(class)
 if(!require("HotDeckImputation")) install.packages("HotDeckImputation"); library(HotDeckImputation)
-if(!require("glmnet")) install.packages("glmnet"); library(glmnet)
-if(!require("lars")) install.packages("lars"); library(lars)
-if(!require("e1071")) install.packages("e1071"); library(e1071)
-if(!require("randomForest")) install.packages("randomForest"); library(randomForest)
+#install.packages("glmnet")
+#install.packages("lars")
+#install.packages("e1071")
+#install.packages("randomForest")
+library(randomForest)
+library(e1071)
 
-
+library(glmnet)
+library(lars)
 #get the data
 train <- read.csv("../DATA/news_popularity_training.csv", sep = ",")
 test <- read.csv("../DATA/news_popularity_test.csv", sep = ",")
@@ -19,12 +22,12 @@ features <- dataset[,-which(colnames(dataset) %in% c("popularity"))]
 ###############################################################
 ##DATA MANIPULATION & CLEANING
 
-#transform number of images & videos into 3-categorical variables (0, 1 or more than 1)  (STORE IT IN A DIFFERENT SCRIPT)
+#transform number of images & videos into 3-categorical variables (0, 1 or more than 1)
 three.cat <- function(x){
-
+  
   for(i in 1:length(x)){
     if(x[i] > 2) x[i] <- 2
-
+    
   }
   return(x)
 }
@@ -33,7 +36,7 @@ features$num_imgs <- three.cat(features$num_imgs)
 features$num_videos <- three.cat(features$num_videos)
 
 
-#Remove non-sense or redundant features:
+#Remove non-sense or redundant features: 
 
 # Remove the constant column
 features$n_non_stop_words <- NULL
@@ -66,7 +69,7 @@ features$max_positive_polarity[features$global_subjectivity == 0] <- NA
 features$max_negative_polarity[features$global_subjectivity == 0] <- NA
 features$global_subjectivity[features$global_subjectivity == 0] <- NA
 
-# Hot deck Imputation (DIFFERENT SCRIPT)
+# Hot deck Imputation
 imp.features <- impute.NN_HD(DATA=features[,-c(1:3)],distance="eukl")
 
 imp.features <- data.frame(url = features$url, imp.features)
@@ -76,9 +79,9 @@ imp.features <- data.frame(url = features$url, imp.features)
 #Veterans, Thanksgiving, Christmas
 
 obtain.date <- function(dataset){
-  dates = c("2013-01-01","2013-01-21","2013-02-18" , "2013-05-27", "2013-07-04",
-            "2013-09-02", "2013-10-14", "2013-11-11", "2013-11-28",
-            "2013-12-25", "2014-01-01", "2014-01-20", "2014-02-17", "2014-05-26",
+  dates = c("2013-01-01","2013-01-21","2013-02-18" , "2013-05-27", "2013-07-04", 
+            "2013-09-02", "2013-10-14", "2013-11-11", "2013-11-28", 
+            "2013-12-25", "2014-01-01", "2014-01-20", "2014-02-17", "2014-05-26", 
             "2014-07-04", "2014-09-01", "2014-10-13", "2014-11-11", "2014-11-27" ,
             "2014-12-25")
    myholidays  <- as.Date(dates,format ="%Y-%m-%d")
@@ -90,9 +93,9 @@ obtain.date <- function(dataset){
   date <- as.Date(date)
   is_holiday <- rep(0,length(year))
   is_holiday[which(date %in% myholidays)] <- 1
-
+  
   a <- data.frame(year = year,month = month, day = day, date = as.character(date), is_holiday = as.numeric(is_holiday))
-
+  
   return(a)
 
 }
@@ -103,11 +106,10 @@ obtained.info <- obtain.date(imp.features)
 
 
 #append the new created features
-imp.features <- data.frame(imp.features, year = obtained.info$year,month = obtained.info$month,
+imp.features <- data.frame(imp.features, year = obtained.info$year,month = obtained.info$month, 
                     is_holiday = obtained.info$is_holiday)
 
 imp.features$url <- NULL
-
 ######Standardization of the features
 #standardize the continuous features
 standardize <- function(x) {
@@ -130,19 +132,22 @@ features.dis <- apply(imp.features[,-c(1:6,9:10,17:28,37:56)],2,cat_stand)
 
 features_clean <- data.frame(features.con, features.dis)
 
+#real_train_pred <- knn(train=features_clean[1:29999,], test = features_clean[30000:39643,], cl = labels[1:29999], k=20)
+#real_train_pred <- knn(train=features_clean[1:30000,], test = features_clean[30001:39643,], cl = labels[1:30000], k=20)
+#real_train_pred <- as.data.frame(real_train_pred)
+
+#final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
+#sum(real_train_pred == final$popularity )/9644
 
 ####################
-#FEATURE SELECTION (CREATE A DIFFERENT SCRIPT FOR FISHER SCORING)
+#FEATURE SELECTION
 
 train.clean <- data.frame(features_clean,popularity = as.numeric(dataset$popularity))[1:30000,]
 test.clean <- features_clean[-c(1:30000),]
-
 #Split into popular and not popular
 train.clean$dummy[train.clean$popularity < 2] <- 0
 train.clean$dummy[train.clean$popularity > 1] <- 1
 
-
-# Compute the Fisher Scoring for each of the feature
 fisher.rank <- function(feature,label){
   num <- (mean(feature[label == 0]) - mean(feature[label == 1]))^2
   denom <- var(feature[label == 0]) + var(feature[label == 1])
@@ -150,58 +155,48 @@ fisher.rank <- function(feature,label){
   return(rank)
 }
 
-# Actual Fisher Scoring
 X = train.clean[,-which(colnames(train.clean) %in% c("popularity","dummy"))]
 fisher.score = apply(X,2,function(x)fisher.rank(x,train.clean$dummy))
 names(fisher.score) = colnames(X)
 
-# Ranking of the top 40 features selected
 top.ranks = fisher.score[order(fisher.score,decreasing = T)]
 top.vars = names(top.ranks[1:40])
 
-# Subset the training and test sets with the selected features
 train.clean = train.clean[,which(colnames(train.clean) %in% c(top.vars,"popularity"))]
 test.clean = features_clean[30001:39644,which(colnames(test.clean) %in% top.vars)]
 
-# Fit a 20-nn for prediction of popularity
 real_train_pred <- knn(train=train.clean[,-41], test = test.clean, cl = train.clean$popularity, k=20)
 real_train_pred <- as.data.frame(real_train_pred)
 
-
 final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
-
-#WE SHOULD REMOVE THIS LINE
 sum(real_train_pred == final$popularity )/9644
 
 
 
-#######################################################################
-#LASSO REGRESSION FOR BOTH PREDICTION AND FEATURE EXTRACTION (THIS CAN BE SAVED IN A DIFFERENT FILE)
+#######################################################################LASSO REGRESSION
 train.clean <- data.frame(features_clean,popularity = as.numeric(dataset$popularity))[1:30000,]
 test.clean <- as.matrix(features_clean[-c(1:30000),])
 
 X <- as.matrix(train.clean[,-60])
 y <- as.factor(train.clean$popularity)
-#lasso.model <- glmnet(x = X, y = y ,family="multinomial")
-#s = min(lasso.model$lambda)
-#pfit = predict(lasso.model,test.clean,s=s,type="class")
+lasso.model <- glmnet(x = X, y = y ,family="multinomial")
+s = min(lasso.model$lambda)
+pfit = predict(lasso.model,test.clean,s=s,type="class")
 
-
-#cross-validated lasso
 cvfit = cv.glmnet(X, y, family="multinomial", type.multinomial = "grouped", dfmax = 20)
 
 pfit = predict(cvfit, newx = test.clean, s = "lambda.min", type = "class")
 
 final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
 sum(pfit == final$popularity )/9644
-
-
-submit <- as.data.frame(cbind(c(30001:39644), pfit))  #CREATE A DIFFERENT SCRIPT JUST FOR THE SUBMISSION
+table(final$popularity)
+table(pfit)
+submit <- as.data.frame(cbind(c(30001:39644), pfit))
 colnames(submit) <- c("id", "popularity")
 
 write.csv(submit, file = "submit4.csv", quote = FALSE, row.names = FALSE)
 
-#top 20 variable selected with lasso
+#top 20 variable selected with lasso 
 rankvar = data.frame(as.matrix(coef(cvfit, s = "lambda.min")[[1]]))
 
 topvar = data.frame(Variable = row.names(rankvar), coef = abs(rankvar$X1))
