@@ -176,10 +176,12 @@ pfit = predict(lasso.model,test.clean,s=s,type="class")
 
 cvfit = cv.glmnet(X, y, family="multinomial", type.multinomial = "grouped", parallel = TRUE)
 
-predict(cvfit, newx = x[1:10,], s = "lambda.min", type = "class")
+pfit = predict(cvfit, newx = test.clean, s = "lambda.min", type = "class")
 
 final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
 sum(pfit == final$popularity )/9644
+table(final$popularity)
+table(pfit)
 ####################
 #CROSS VALIDATION
 
