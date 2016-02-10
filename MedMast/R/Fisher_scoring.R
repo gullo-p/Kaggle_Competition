@@ -6,19 +6,33 @@
 #' @param feature The dataframe containing the features.
 #' @param label The binary label according to which you want to measure the variability of each feature.
 #' @param n The number of features with the highest score you want to select for your final model.
+#' @param threshold The value to use as the threshold for converting the label to binary.
 #' @return A dataframe containing the selected features.
 
+fisher.selection <- function(features,labels,n,threshold){
+  
+  library(assertthat)
+  not_empty(features); not_empty(labels);
+  assert_that(nrow(features) == length(labels))
+  is.count(n); assert_that(n <= ncol(features));
+  is.count(threshold);
 
-fisher.rank <- function(feature,label){
-  num <- (mean(feature[label == 0]) - mean(feature[label == 1]))^2
-  denom <- var(feature[label == 0]) + var(feature[label == 1])
-  rank <- round(num/denom,4)
-  return(rank)
+  y <- rep(0,length(labels))
+  y[labels > threshold] <- 1
+  
+  fisher.score <- function(x,y){
+    num <- (mean(x[y == 0]) - mean(x[y == 1]))^2
+    denom <- var(x[y == 0]) + var(x[y == 1])
+    score <- round(num/denom,4)
+    return(score)
+  }
+  
+  fisher.score = apply(features,2,function(x)fisher.score(x,y))
+  names(fisher.score) = colnames(features)
+  
+  top.ranks = fisher.score[order(fisher.score,decreasing = T)]
+  top.vars = names(top.ranks[1:n])
+  
+  result.frame <- features[,top.vars]
+  return(result.frame)
 }
-
-X = train.clean[,-which(colnames(train.clean) %in% c("popularity","dummy"))]
-fisher.score = apply(X,2,function(x)fisher.rank(x,train.clean$dummy))
-names(fisher.score) = colnames(X)
-
-top.ranks = fisher.score[order(fisher.score,decreasing = T)]
-top.vars = names(top.ranks[1:40])

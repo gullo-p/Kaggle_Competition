@@ -1,21 +1,44 @@
-########LASSO REGRESSION
-train.clean <- data.frame(features_clean,popularity = as.numeric(dataset$popularity))[1:30000,]
-test.clean <- as.matrix(features_clean[-c(1:30000),])
+# ----------------------------------------------------------------------------------------------------
+# LASSO MODEL FOR FEATURE SELECTION AND PREDICTION
+# ----------------------------------------------------------------------------------------------------
+#' This function computes the Fisher scoring for each feature
+#' based on a binary output and ranks them in descending order.
+#' @param feature The dataframe containing the features.
+#' @param label The binary label according to which you want to measure the variability of each feature.
+#' @param n The number of features with the highest score you want to select for your final model.
+#' @param threshold The value to use as the threshold for converting the label to binary.
+#' @return A dataframe containing the selected features.
 
-X <- as.matrix(train.clean[,-60])
-y <- as.factor(train.clean$popularity)
-lasso.model <- glmnet(x = X, y = y ,family="multinomial")
-s = min(lasso.model$lambda)
-pfit = predict(lasso.model,test.clean,s=s,type="class")
-
-cvfit = cv.glmnet(X, y, family="multinomial", type.multinomial = "grouped", dfmax = 20)
-
-pfit = predict(cvfit, newx = test.clean, s = "lambda.min", type = "class")
-
-#top 20 variable selected with lasso 
-rankvar = data.frame(as.matrix(coef(cvfit, s = "lambda.min")[[1]]))
-
-topvar = data.frame(Variable = row.names(rankvar), coef = abs(rankvar$X1))
-topvar = topvar[which(topvar$coef >0),]
-topvar = topvar[-1,]
-topvar = as.character(topvar[,1])
+lasso.model = function(train.features, labels, type = "select", test.features = NULL, dfmax = NULL) {
+  library(assertthat)
+  library(glmnet)
+  
+  # test the inputs
+  not_empty(train.features); not_empty(labels);
+  is.string(type); assert_that(type %in% c("select", "predict"))
+  assert_that(nrow(train.features) == length(labels))
+  if (type == "predict") {
+    assert_that(not_empty(test.features) &
+                  ncol(test.features) == ncol(train.features))
+  }else {
+    is.count(dfmax); assert_that(dfmax <= ncol(train.features));
+  }
+  
+  X <- as.matrix(train.features)
+  y <- as.factor(labels)
+  
+  if (type == "select") {
+    cvfit = cv.glmnet(X, y, family = "multinomial", type.multinomial = "grouped", dfmax = dfmax)
+    rankvar = data.frame(as.matrix(coef(cvfit, s = "lambda.min")[[1]]))
+    rankvar = data.frame(Variable = row.names(rankvar), coef = abs(rankvar$X1))
+    top.vars = subset(rankvar,coef > 0, Variable)
+    top.vars = as.character(top.vars$Variable)[-1]
+    
+    result.frame <- train.features[,top.vars]
+    return(result.frame)
+  }else{
+    cvfit = cv.glmnet(X, y, family = "multinomial")
+    pfit = predict(cvfit, newx = test.features, s = "lambda.min", type = "class")
+    return(pfit)
+  }
+}

@@ -3,6 +3,11 @@
 #Veterans, Thanksgiving, Christmas
 
 obtain.date <- function(dataset){
+  
+  library(assertthat)
+  # test the inputs
+  not_empty(dataset);
+  
   dates = c("2013-01-01","2013-01-21","2013-02-18" , "2013-05-27", "2013-07-04", 
             "2013-09-02", "2013-10-14", "2013-11-11", "2013-11-28", 
             "2013-12-25", "2014-01-01", "2014-01-20", "2014-02-17", "2014-05-26", 
@@ -18,19 +23,8 @@ obtain.date <- function(dataset){
   is_holiday <- rep(0,length(year))
   is_holiday[which(date %in% myholidays)] <- 1
   
-  a <- data.frame(year = year,month = month, day = day, date = as.character(date), is_holiday = as.numeric(is_holiday))
+  updated.frame <- data.frame(dataset, year = year,month = month,is_holiday = as.numeric(is_holiday))
   
-  return(a)
+  return(updated.frame)
   
 }
-
-
-#obtain dates for training set
-obtained.info <- obtain.date(imp.features)
-
-
-#append the new created features
-imp.features <- data.frame(imp.features, year = obtained.info$year,month = obtained.info$month, 
-                           is_holiday = obtained.info$is_holiday)
-
-imp.features$url <- NULL

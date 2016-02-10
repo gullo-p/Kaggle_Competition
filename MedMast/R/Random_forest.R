@@ -5,9 +5,9 @@ library(randomForest)
 
 
 #Best performance so far
-rf <- randomForest(x = train_stand[1:30000,4:63], y = train_stand[1:30000,64], 
-                   xtest = test_stand[,4:63],  ntree=500,nPerm=2,mtry=3,
-                   proximity=TRUE,importance=TRUE)
+rf <- randomForest(x = train[,3:61], y = train[,62], 
+                   xtest = test[,3:61],  ntree=100,nPerm=1,mtry=3,
+                   proximity=TRUE,importance=TRUE,nodesize = 20)
 
 pred <- rf$test$predicted
 sum(popularity$popularity == pred)/length(popularity$popularity)
