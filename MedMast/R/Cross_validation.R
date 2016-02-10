@@ -1,7 +1,7 @@
 ####################
 #CROSS VALIDATION
 # Among the inputs we can have the four different models we used (lasso, random forest, knn, svm)
-
+cross <- function(){
 #test and cross validations
 ind <- sample(2, nrow(train_stand), replace=TRUE, prob=c(0.75, 0.25))
 train.training <- train_stand[ind==1, 3:64]
@@ -20,3 +20,4 @@ result <- cbind(train_pred, train.testLabels)
 sum(result$train_pred == train.testLabels)/10008
 
 #loop for optimization is missing.
+}
