@@ -1,4 +1,14 @@
 
+train <- read.csv("../DATA/news_popularity_training.csv", sep = ",")
+test <- read.csv("../DATA/news_popularity_test.csv", sep = ",")
+final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
+
+train <- train[,3:62]
+test <- test[, 3:61]
+test.clean = features_clean[30001:39644,]
+test.clean <- as.matrix(features_clean[-c(1:30000),])
+
+
 #Svm with cleaned data (standardized + imputed)
 model0 <- svm( train.clean$popularity~., train.clean )
 res <- predict( model0, newdata=test.clean )

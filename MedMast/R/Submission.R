@@ -5,6 +5,8 @@
 #' @param fit A vector of length 9644 containing the predicted labels for the test dataset.
 #' @param sub_numb An integer indicating the number of the generating submission.
 #' @return A csv file in the working directory ready for submission named submitX.csv, with X=sub_numb.
+#' @export
+
 
 submit <- function(fit, sub_numb){
    data <- data.frame(cbind(c(30001:39644), fit))

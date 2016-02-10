@@ -10,6 +10,8 @@ dataset <- rbind(train,test)
 features <- dataset[,-which(colnames(dataset) %in% c("popularity"))]
 labels <- as.numeric(dataset$popularity)
 
+
+
 # DATA MANIPULATION & CLEANING
 
 #transform number of images & videos into 3-categorical variables (0, 1 or more than 1)
@@ -21,7 +23,7 @@ features$num_videos <- as.numeric(cut(features$num_videos,breaks=c(0,1,2,Inf),in
 # Remove the constant column
 features$n_non_stop_words <- NULL
 
-# Remove the rate negative_words
+# Remove the rate of negative_words
 features$rate_negative_words <- NULL
 
 # Remove the ukrain outlier

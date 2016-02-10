@@ -1,5 +1,13 @@
-# Wrap them in a unique function that controls if the input is continuous or categorical
-######Standardization of the features
+# ----------------------------------------------------------------------------------------------------
+# Feature standardization
+# ----------------------------------------------------------------------------------------------------
+#' This function standardized a feature, either continuous or discrete. 
+#' @param x A vector containing the feature to be standardized.
+#' @param type A string with values "continuous" or "discrete" depending on the type of the feature.
+#' @return The standardized variable.
+#' @export
+#' @import assertthat
+
 
 standardize <- function(x,type = "continuous"){
   

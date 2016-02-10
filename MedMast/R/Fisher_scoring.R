@@ -3,11 +3,22 @@
 # ----------------------------------------------------------------------------------------------------
 #' This function computes the Fisher scoring for each feature 
 #' based on a binary output and ranks them in descending order.
-#' @param feature The dataframe containing the features.
-#' @param label The binary label according to which you want to measure the variability of each feature.
+#' @param features The dataframe containing the features.
+#' @param labels The categorical labels (in our case we have 5 categories) 
+#' according to which you want to measure the variability of each feature.
 #' @param n The number of features with the highest score you want to select for your final model.
 #' @param threshold The value to use as the threshold for converting the label to binary.
 #' @return A dataframe containing the selected features.
+#' @export
+#' @import assertthat
+#' @examples 
+#' # create sample dataset
+#' features <- matrix(rnorm(200), ncol=2)
+#' labels <- c(rep(1, 40), rep(2, 40), rep(3,40), rep(4, 40), rep(5,40))
+#' n <- 1
+#' threshold <- 2 #categories above 2 will be set to be 1, otherwise 0.
+#' # get the variable with the highest fisher scoring
+#' fisher.selection(features, labels, n, threshold)
 
 fisher.selection <- function(features,labels,n,threshold){
   

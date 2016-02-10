@@ -1,15 +1,27 @@
 # ----------------------------------------------------------------------------------------------------
 # LASSO MODEL FOR FEATURE SELECTION AND PREDICTION
 # ----------------------------------------------------------------------------------------------------
-#' This function computes the Fisher scoring for each feature
-#' based on a binary output and ranks them in descending order.
-#' @param feature The dataframe containing the features.
-#' @param label The binary label according to which you want to measure the variability of each feature.
-#' @param n The number of features with the highest score you want to select for your final model.
-#' @param threshold The value to use as the threshold for converting the label to binary.
-#' @return A dataframe containing the selected features.
+#' This function uses cross-validated Lasso regression (generalised to multinomial output) 
+#' for both multiclass classification and feature selection.
+#' @param train.features A dataframe containing the training dataset (output excluded).
+#' @param labels A vector of multi-class labels for the training set.
+#' @param type A string with values "select" for performing feature selection or "predict" for 
+#' predictions using Lasso (by default it is set to "select").
+#' @param test.features A dataframe containing the test dataset (NULL if type = "select").
+#' @param dfmax = An integer which, if not NULL, indicates how many features to be 
+#' extracted (NULL by default).
+#' @return If type = "select" the function returns a dataframe with the extracted features, 
+#' else if type = "predict" it returns the vector of predicted labels.
+#' @export
+#' @import assertthat
+#' @import glmnet
+#' @examples 
+#' # create sample dataset
+#' features <- matrix(rnorm(200), ncol=2)
+#' labels <- c(rep(1, 40), rep(2, 40), rep(3,40), rep(4, 40), rep(5,40))
+#' lasso.model(train.features = features, labels, type = "select", dfmax = 1)
 
-lasso.model = function(train.features, labels, type = "select", test.features = NULL, dfmax = NULL) {
+lasso.model <- function(train.features, labels, type = "select", test.features = NULL, dfmax = NULL) {
   library(assertthat)
   library(glmnet)
   
