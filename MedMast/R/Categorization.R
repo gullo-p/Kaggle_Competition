@@ -1,5 +1,10 @@
-
-#transform a feature into a 3-categorical (0, 1 or more than 1)
+# ----------------------------------------------------------------------------------------------------
+# CREATE CATEGORICAL VARIABLES
+# ----------------------------------------------------------------------------------------------------
+#' This function transforms a feature into a 3-categorical (0, 1, 2 valued) one.
+#' @param x The vector containing the feature you wish to categorize.
+#' @param lambda1, lambda2 parameters that define the three cuts for setting the values 0, 1 and 2.
+#' @return The categorized feature.
 three.cat <- function(x, lambda1, lambda2){
   
   for(i in 1:length(x)){
