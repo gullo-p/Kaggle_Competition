@@ -12,3 +12,9 @@
 - Imputed missing values/Removed the outliers
 - Standardized both continuous and categorical inputs
 - Extracted most significant features using Fisher Scoring and/or Lasso
+
+
+### Packages needed to run MedMast:
+- glmnet
+- assertthat
+- HotDeckImputation
