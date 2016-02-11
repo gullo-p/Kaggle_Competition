@@ -63,6 +63,7 @@ fish.features <- fisher.selection(train.features,train.labels,n = 20,threshold =
 lass.features <- lasso.model(train.features,train.labels,type = "select",dfmax = 20)
 
 #######################################################################################
+# MODELLING
 #Try a knn with the 20 variables selected by lasso
 train.clean = train.clean[,which(colnames(train.clean) %in% c(topvar,"popularity"))]
 test.clean = features_clean[30001:39644,which(colnames(test.clean) %in% topvar)]
