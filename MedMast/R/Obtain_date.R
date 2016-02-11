@@ -11,7 +11,7 @@
 
 obtain.date <- function(dataset){
   
-  library(assertthat)
+  if(!require("assertthat")) install.packages("assertthat"); library(assertthat)
   # test the inputs
   not_empty(dataset);
   

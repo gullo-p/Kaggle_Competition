@@ -21,8 +21,8 @@
 #' fisher.selection(features, labels, n, threshold)
 
 fisher.selection <- function(features,labels,n,threshold){
+  if(!require("assertthat")) install.packages("assertthat"); library(assertthat)
   
-  library(assertthat)
   not_empty(features); not_empty(labels);
   assert_that(nrow(features) == length(labels))
   is.count(n); assert_that(n <= ncol(features));

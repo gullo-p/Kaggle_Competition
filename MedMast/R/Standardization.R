@@ -11,7 +11,7 @@
 
 standardize <- function(x,type = "continuous"){
   
-  library(assertthat)
+  if(!require("assertthat")) install.packages("assertthat"); library(assertthat)
   # test the inputs
   not_empty(x);
   is.string(type); assert_that(type %in% c("continuous", "discrete"))

@@ -10,4 +10,8 @@ Description: This package wraps up the computations for the Machine Learning
 License: NA
 LazyData: TRUE
 RoxygenNote: 5.0.1
-Dependencies: assertthat, glmnet, HotDeckImputation
+Depends:
+    R (>= 2.15.0),
+    assertthat,
+    glmnet, 
+    HotDeckImputation

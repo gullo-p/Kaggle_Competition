@@ -22,8 +22,9 @@
 #' lasso.model(train.features = features, labels, type = "select", dfmax = 1)
 
 lasso.model <- function(train.features, labels, type = "select", test.features = NULL, dfmax = NULL) {
-  library(assertthat)
-  library(glmnet)
+  if(!require("assertthat")) install.packages("assertthat"); library(assertthat)
+  if(!require("glmnet")) install.packages("glmnet"); library(glmnet)
+  
   
   # test the inputs
   not_empty(train.features); not_empty(labels);

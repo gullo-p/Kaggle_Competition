@@ -12,9 +12,9 @@
 
 
 handle.missing <- function(features,type){
-  
-  library(assertthat)
-  library(HotDeckImputation)
+  if(!require("HotDeckImputation")) install.packages("HotDeckImputation"); library(HotDeckImputation)
+  if(!require("assertthat")) install.packages("assertthat"); library(assertthat)
+
   # test the inputs
   not_empty(features);
   is.string(type); assert_that(type %in% c("remove", "impute"))
