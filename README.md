@@ -1,6 +1,6 @@
 # Kaggle_Competition
 
-### To Hrvoje:
+### Instructions for the interim submission:
 The package MedMast is contained in MedMast folder.
 For reproducing our current best score, consider the script Test.R in the SCRIPTS folder.
 
