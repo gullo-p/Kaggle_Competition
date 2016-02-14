@@ -1,7 +1,4 @@
-# ----------------------------------------------------------------------------------------------------
-# Handle missing values
-# ----------------------------------------------------------------------------------------------------
-#' @title Handle missing values
+#' Handle missing values
 #'
 #' This function deals with the cleaning and/or imputation of the missing values in the data.
 #' 

@@ -2,7 +2,8 @@
 % Please edit documentation in R/Submission.R
 \name{submit}
 \alias{submit}
-\title{Function for creating a csv in the right format for submission.}
+\title{Submission generator.
+Function for creating a csv in the right format for submission.}
 \usage{
 submit(fit, sub_numb)
 }
@@ -13,8 +14,5 @@ submit(fit, sub_numb)
 }
 \value{
 A csv file in the working directory ready for submission named submitX.csv, with X=sub_numb.
-}
-\description{
-Function for creating a csv in the right format for submission.
 }
 

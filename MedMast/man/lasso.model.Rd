@@ -2,7 +2,8 @@
 % Please edit documentation in R/Lasso.R
 \name{lasso.model}
 \alias{lasso.model}
-\title{This function uses cross-validated Lasso regression (generalised to multinomial output) 
+\title{Lasso model for feature selection and prediction.
+This function uses cross-validated Lasso regression (generalised to multinomial output) 
 for both multiclass classification and feature selection.}
 \usage{
 lasso.model(train.features, labels, type = "select", test.features = NULL,
@@ -24,10 +25,6 @@ extracted (NULL by default).}
 \value{
 If type = "select" the function returns a dataframe with the extracted features, 
 else if type = "predict" it returns the vector of predicted labels.
-}
-\description{
-This function uses cross-validated Lasso regression (generalised to multinomial output) 
-for both multiclass classification and feature selection.
 }
 \examples{
 # create sample dataset

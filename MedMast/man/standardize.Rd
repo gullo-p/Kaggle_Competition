@@ -2,7 +2,8 @@
 % Please edit documentation in R/Standardization.R
 \name{standardize}
 \alias{standardize}
-\title{This function standardized a feature, either continuous or discrete.}
+\title{Feature standardization.
+This function standardized a feature, either continuous or discrete.}
 \usage{
 standardize(x, type = "continuous")
 }
@@ -13,8 +14,5 @@ standardize(x, type = "continuous")
 }
 \value{
 The standardized variable.
-}
-\description{
-This function standardized a feature, either continuous or discrete.
 }
 
