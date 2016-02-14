@@ -2,10 +2,7 @@
 % Please edit documentation in R/Fisher_scoring.R
 \name{fisher.selection}
 \alias{fisher.selection}
-\title{Fisher Scoring for feature selection.
-
-This function computes the Fisher scoring for each feature 
-based on a binary output and ranks them in descending order.}
+\title{Fisher Scoring for feature selection.}
 \usage{
 fisher.selection(features, labels, n, threshold)
 }
@@ -21,6 +18,10 @@ according to which you want to measure the variability of each feature.}
 }
 \value{
 A dataframe containing the selected features.
+}
+\description{
+This function computes the Fisher scoring for each feature 
+based on a binary output and ranks them in descending order.
 }
 \examples{
 # create sample dataset
