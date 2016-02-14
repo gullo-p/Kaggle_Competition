@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------------------------------------
 #' @title Lasso model for feature selection and prediction.
 
-#' This function uses cross-validated Lasso regression (generalised to multinomial output) 
+#' @description This function uses cross-validated Lasso regression (generalised to multinomial output) 
 #' for both multiclass classification and feature selection.
 #' 
 #' @param train.features A dataframe containing the training dataset (output excluded).

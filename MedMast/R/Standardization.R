@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------------------------------------
 #' @title Feature standardization.
 
-#' This function standardized a feature, either continuous or discrete. 
+#' @description This function standardized a feature, either continuous or discrete. 
 #' 
 #' @param x A vector containing the feature to be standardized.
 #' @param type A string with values "continuous" or "discrete" depending on the type of the feature.
