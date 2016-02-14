@@ -1,12 +1,16 @@
 # Kaggle_Competition
 
+### To Hrvoje:
+The package MedMast is contained in MedMast folder.
+For reproducing our current best score, consider the script Test.R in the SCRIPTS folder.
 
 ### Algorithms used:
 - Knn
 - Svm
-- Random Forest
+- Random Forest with rolling windows
 - Lasso Regression with generalized linear model (multinomial type)
 - Boosting
+- Ordinal regression
 
 ### Data analysis:
 - Imputed missing values/Removed the outliers
@@ -18,3 +22,5 @@
 - glmnet
 - assertthat
 - HotDeckImputation
+- randomForest
+
