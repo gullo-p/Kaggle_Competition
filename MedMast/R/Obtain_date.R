@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------------------------------------
 #' @title Obtain the date
 #' 
-#' @description This function creates the variables year, month, day and date from the url of each news, 
+#' This function creates the variables year, month, day and date from the url of each news, 
 #' and also a variable called is.holiday which is a binary that checks if the date is among 
 #' the holiday's days.
 #' 

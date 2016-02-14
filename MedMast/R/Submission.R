@@ -1,7 +1,10 @@
 # ----------------------------------------------------------------------------------------------------
 # SUBMISSION GENERATOR
 # ----------------------------------------------------------------------------------------------------
+#' @title Submission generator.
+
 #' Function for creating a csv in the right format for submission.
+#' 
 #' @param fit A vector of length 9644 containing the predicted labels for the test dataset.
 #' @param sub_numb An integer indicating the number of the generating submission.
 #' @return A csv file in the working directory ready for submission named submitX.csv, with X=sub_numb.

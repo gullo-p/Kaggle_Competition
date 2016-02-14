@@ -1,8 +1,11 @@
 # ----------------------------------------------------------------------------------------------------
 # FISHER SCORING FOR FEATURE SELECTION
 # ----------------------------------------------------------------------------------------------------
+#' @title Fisher Scoring for feature selection.
+#' 
 #' This function computes the Fisher scoring for each feature 
 #' based on a binary output and ranks them in descending order.
+#' 
 #' @param features The dataframe containing the features.
 #' @param labels The categorical labels (in our case we have 5 categories) 
 #' according to which you want to measure the variability of each feature.
