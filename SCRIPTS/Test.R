@@ -47,7 +47,7 @@ time.data$data_channel_is_others[which(rowSums(time.data[,c(14:19)])==0)] <- 1
 
 # Convert the response to ordinal
 time.data$popularity <- factor(time.data$popularity, ordered = TRUE)
-final$popularity <- factor(final$popularity, ordered = TRUE)
+
 
 
 # PREDICTIONS
@@ -57,3 +57,4 @@ rf.predictions <- rolling.windows.rf(dataset = time.data)
 colnames(rf.predictions) <- c("id","popularity")
 
 write.table(rf.predictions,"submit.csv",sep=",",row.names = F)
+
