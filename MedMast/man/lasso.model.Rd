@@ -17,7 +17,7 @@ predictions using Lasso (by default it is set to "select").}
 
 \item{test.features}{A dataframe containing the test dataset (NULL if type = "select").}
 
-\item{dfmax}{= An integer which, if not NULL, indicates how many features to be 
+\item{dfmax}{An integer which, if not NULL, indicates how many features to be 
 extracted (NULL by default).}
 }
 \value{
@@ -32,6 +32,6 @@ for both multiclass classification and feature selection.
 # create sample dataset
 features <- matrix(rnorm(200), ncol=2)
 labels <- c(rep(1, 40), rep(2, 40), rep(3,40), rep(4, 40), rep(5,40))
-lasso.model(train.features = features, labels, type = "select", dfmax = 1)
+lasso.model(train.features = features, labels, type = "select", dfmax = 1) #this will select the most important feature in the dataset.
 }
 

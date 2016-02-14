@@ -4,8 +4,8 @@
 #' @title Fisher Scoring for feature selection
 #' 
 #' @description This function computes the Fisher scoring for each feature 
-#' based on the binary version of the popularity labels ("non-popular" being 0 and "popular" being 1) 
-#' and ranks them in descending order.
+#' based on the binary version of the popularity label ("non-popular" being 0 and "popular" being 1) 
+#' and ranks the Fisher scoring of the features in descending order.
 #' 
 #' @param features The dataframe containing the features.
 #' @param labels The categorical labels (in our case we have 5 categories for popularity) 

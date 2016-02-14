@@ -9,19 +9,20 @@ fisher.selection(features, labels, n, threshold)
 \arguments{
 \item{features}{The dataframe containing the features.}
 
-\item{labels}{The categorical labels (in our case we have 5 categories) 
+\item{labels}{The categorical labels (in our case we have 5 categories for popularity) 
 according to which you want to measure the variability of each feature.}
 
 \item{n}{The number of features with the highest score you want to select for your final model.}
 
-\item{threshold}{The value to use as the threshold for converting the label to binary.}
+\item{threshold}{The value to use as the threshold for converting the categorical labels to binary.}
 }
 \value{
 A dataframe containing the selected features.
 }
 \description{
 This function computes the Fisher scoring for each feature 
-based on a binary output and ranks them in descending order.
+based on the binary version of the popularity label ("non-popular" being 0 and "popular" being 1) 
+and ranks the Fisher scoring of the features in descending order.
 }
 \examples{
 # create sample dataset
