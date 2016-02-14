@@ -2,9 +2,7 @@
 % Please edit documentation in R/Imputation.R
 \name{handle.missing}
 \alias{handle.missing}
-\title{Handle missing values
-
-This function deals with the cleaning and/or imputation of the missing values in the data.}
+\title{Handle missing values}
 \usage{
 handle.missing(features, type)
 }
@@ -16,5 +14,8 @@ handle.missing(features, type)
 }
 \value{
 The features dataframe modified accordingly.
+}
+\description{
+This function deals with the cleaning and/or imputation of the missing values in the data.
 }
 
