@@ -1,7 +1,6 @@
 # ----------------------------------------------------------------------------------------------------
 # Obtaining date
 # ----------------------------------------------------------------------------------------------------
-#' 
 #' @title Obtain the date
 #' 
 #' @description This function creates the variables year, month, day and date from the url of each news, 
