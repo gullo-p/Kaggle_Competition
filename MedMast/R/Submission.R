@@ -1,7 +1,7 @@
 # ----------------------------------------------------------------------------------------------------
 # SUBMISSION GENERATOR
 # ----------------------------------------------------------------------------------------------------
-#' @title Submission generator.
+#' @title Submission generator
 
 #' @description Function for creating a csv in the right format for submission.
 #' 

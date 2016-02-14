@@ -1,7 +1,7 @@
 # ----------------------------------------------------------------------------------------------------
 # Feature standardization
 # ----------------------------------------------------------------------------------------------------
-#' @title Feature standardization.
+#' @title Feature standardization
 
 #' @description This function standardized a feature, either continuous or discrete. 
 #' 

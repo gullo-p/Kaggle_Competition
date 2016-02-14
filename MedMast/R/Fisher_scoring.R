@@ -1,7 +1,7 @@
 # ----------------------------------------------------------------------------------------------------
 # FISHER SCORING FOR FEATURE SELECTION
 # ----------------------------------------------------------------------------------------------------
-#' @title Fisher Scoring for feature selection.
+#' @title Fisher Scoring for feature selection
 #' 
 #' @description This function computes the Fisher scoring for each feature 
 #' based on a binary output and ranks them in descending order.

@@ -1,7 +1,7 @@
 # ----------------------------------------------------------------------------------------------------
 # LASSO MODEL FOR FEATURE SELECTION AND PREDICTION
 # ----------------------------------------------------------------------------------------------------
-#' @title Lasso model for feature selection and prediction.
+#' @title Lasso model for feature selection and prediction
 
 #' @description This function uses cross-validated Lasso regression (generalised to multinomial output) 
 #' for both multiclass classification and feature selection.
