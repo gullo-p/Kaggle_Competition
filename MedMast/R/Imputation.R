@@ -1,6 +1,6 @@
-#' Handle missing values
+#' @title Handle missing values
 #'
-#' This function deals with the cleaning and/or imputation of the missing values in the data.
+#' @description This function deals with the cleaning and/or imputation of the missing values in the data.
 #' 
 #' @param features A dataframe containing the dataset you want to clean or impute.
 #' @param type A string which can take the value "remove" if you want to remove the nonsense 
