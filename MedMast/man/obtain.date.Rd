@@ -2,9 +2,7 @@
 % Please edit documentation in R/Obtain_date.R
 \name{obtain.date}
 \alias{obtain.date}
-\title{This function creates the variables year, month, day and date from the url of each news, 
-and also a variable called is.holiday which is a binary that checks if the date is among 
-the holiday's days.}
+\title{Obtain the date}
 \usage{
 obtain.date(dataset)
 }
@@ -13,10 +11,5 @@ obtain.date(dataset)
 }
 \value{
 The updated dataset with year, month and is.holiday variables added.
-}
-\description{
-This function creates the variables year, month, day and date from the url of each news, 
-and also a variable called is.holiday which is a binary that checks if the date is among 
-the holiday's days.
 }
 
