@@ -1,7 +1,7 @@
 # ----------------------------------------------------------------------------------------------------
 # FISHER SCORING FOR FEATURE SELECTION
 # ----------------------------------------------------------------------------------------------------
-#' @title Fisher Scoring for feature selection
+#' @title Fisher scoring for feature selection
 #' 
 #' @description This function computes the Fisher scoring for each feature 
 #' based on the binary version of the popularity label ("non-popular" being 0 and "popular" being 1) 
@@ -24,17 +24,19 @@
 #' # get the variable with the highest fisher scoring
 #' fisher.selection(features, labels, n, threshold)
 
+
 fisher.selection <- function(features,labels,n,threshold){
   if(!require("assertthat")) install.packages("assertthat"); library(assertthat)
-  
+  # Test the inputs
   not_empty(features); not_empty(labels);
   assert_that(nrow(features) == length(labels))
   is.count(n); assert_that(n <= ncol(features));
   is.count(threshold);
-
+  # Convert response to binary
   y <- rep(0,length(labels))
   y[labels > threshold] <- 1
   
+  # Function to caluclate the variable score
   fisher.score <- function(x,y){
     num <- (mean(x[y == 0]) - mean(x[y == 1]))^2
     denom <- var(x[y == 0]) + var(x[y == 1])
@@ -47,7 +49,7 @@ fisher.selection <- function(features,labels,n,threshold){
   
   top.ranks = fisher.score[order(fisher.score,decreasing = T)]
   top.vars = names(top.ranks[1:n])
-  
+  # subset the data with the top variables
   result.frame <- features[,top.vars]
   return(result.frame)
 }

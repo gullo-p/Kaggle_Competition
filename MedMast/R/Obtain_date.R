@@ -1,3 +1,6 @@
+# ----------------------------------------------------------------------------------------------------
+# Obtain the date
+# ----------------------------------------------------------------------------------------------------
 #' @title Obtain the date
 #' 
 #' @description This function creates the variables year, month, day and date from the url of each news, 
@@ -14,7 +17,7 @@ obtain.date <- function(dataset){
   if(!require("assertthat")) install.packages("assertthat"); library(assertthat)
   # test the inputs
   not_empty(dataset);
-  
+  # List of Holidays
   dates = c("2013-01-01","2013-01-21","2013-02-18" , "2013-05-27", "2013-07-04", 
             "2013-09-02", "2013-10-14", "2013-11-11", "2013-11-28", 
             "2013-12-25", "2014-01-01", "2014-01-20", "2014-02-17", "2014-05-26", 

@@ -1,5 +1,8 @@
+# ----------------------------------------------------------------------------------------------------
+# Handle missing values
+# ----------------------------------------------------------------------------------------------------
 #' @title Handle missing values
-#'
+#' 
 #' @description This function deals with the cleaning and/or imputation of the missing values in the data.
 #' 
 #' @param features A dataframe containing the dataset you want to clean or impute.
@@ -10,8 +13,8 @@
 #' @import assertthat
 #' @import HotDeckImputation
 
-
 handle.missing <- function(features,type){
+  
   if(!require("HotDeckImputation")) install.packages("HotDeckImputation"); library(HotDeckImputation)
   if(!require("assertthat")) install.packages("assertthat"); library(assertthat)
 
@@ -20,36 +23,20 @@ handle.missing <- function(features,type){
   is.string(type); assert_that(type %in% c("remove", "impute"))
   
   if(type == "remove"){
-    features <- features[-which(features$n_tokens_content == 0 & features$id <= 30000),]
-    features <- features[-which(features$global_subjectivity == 0 & features$id <= 30000),]
-    features <- handle.missing(features , type = "impute")
-  }else{
+    # Remove the missing values
+    features <- features[-which(features$n_tokens_content == 0),]
+    features <- features[-which(features$global_subjectivity == 0),]
     
-    # Recode the missing values
-    features$n_unique_tokens[features$n_tokens_content == 0] <- NA
-    features$n_non_stop_unique_tokens[features$n_tokens_content == 0] <- NA
-    features$num_hrefs[features$n_tokens_content == 0] <- NA
-    features$num_self_hrefs[features$n_tokens_content == 0] <- NA
-    features$average_token_length[features$n_tokens_content == 0] <- NA
-    features$n_tokens_content[features$n_tokens_content == 0] <- NA
+  }else if(type == "impute"){
     
+    index1 <- match("n_tokens_content",colnames(features))
+    index2 <- match("global_subjectivity",colnames(features))
     # Recode the missing values
-    features$global_sentiment_polarity[features$global_subjectivity == 0] <- NA
-    features$global_rate_positive_words[features$global_subjectivity == 0] <- NA
-    features$global_rate_negative_words[features$global_subjectivity == 0] <- NA
-    features$rate_positive_words[features$global_subjectivity == 0] <- NA
-    features$avg_positive_polarity[features$global_subjectivity == 0] <- NA
-    features$avg_negative_polarity[features$global_subjectivity == 0] <- NA
-    features$min_positive_polarity[features$global_subjectivity == 0] <- NA
-    features$min_negative_polarity[features$global_subjectivity == 0] <- NA
-    features$max_positive_polarity[features$global_subjectivity == 0] <- NA
-    features$max_negative_polarity[features$global_subjectivity == 0] <- NA
-    features$global_subjectivity[features$global_subjectivity == 0] <- NA
+    features[features$n_tokens_content == 0,c(index1:(index1+4),(index1+7))] <- NA
+    features[features$global_subjectivity == 0,c(index2:(index2+10)] <- NA
     
     # Hot deck Imputation
-    imp.features <- impute.NN_HD(DATA=features[,-c(1,2)],distance="eukl")
-    
-    features <- data.frame(id = features$id, url = features$url, imp.features)
+    features <- impute.NN_HD(DATA=features,distance="eukl")
   }
   return(features)
 }

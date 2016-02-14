@@ -2,7 +2,7 @@
 # SUBMISSION GENERATOR
 # ----------------------------------------------------------------------------------------------------
 #' @title Submission generator
-
+#' 
 #' @description Function for creating a csv in the right format for submission.
 #' 
 #' @param fit A vector of length 9644 containing the predicted labels for the test dataset.

@@ -23,7 +23,8 @@
 #' features <- matrix(rnorm(200), ncol=2)
 #' labels <- c(rep(1, 40), rep(2, 40), rep(3,40), rep(4, 40), rep(5,40))
 #' lasso.model(train.features = features, labels, type = "select", dfmax = 1) #this will select the most important feature in the dataset.
-
+ 
+ 
 lasso.model <- function(train.features, labels, type = "select", test.features = NULL, dfmax = NULL) {
   if(!require("assertthat")) install.packages("assertthat"); library(assertthat)
   if(!require("glmnet")) install.packages("glmnet"); library(glmnet)
@@ -44,6 +45,7 @@ lasso.model <- function(train.features, labels, type = "select", test.features =
   y <- as.factor(labels)
   
   if (type == "select") {
+    # Feaure Selection
     cvfit = cv.glmnet(X, y, family = "multinomial", type.multinomial = "grouped", dfmax = dfmax)
     rankvar = data.frame(as.matrix(coef(cvfit, s = "lambda.min")[[1]]))
     rankvar = data.frame(Variable = row.names(rankvar), coef = abs(rankvar$X1))
@@ -53,6 +55,7 @@ lasso.model <- function(train.features, labels, type = "select", test.features =
     result.frame <- train.features[,top.vars]
     return(result.frame)
   }else{
+    # Prediction
     cvfit = cv.glmnet(X, y, family = "multinomial")
     pfit = predict(cvfit, newx = test.features, s = "lambda.min", type = "class")
     return(pfit)
