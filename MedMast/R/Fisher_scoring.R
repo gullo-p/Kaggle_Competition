@@ -4,13 +4,14 @@
 #' @title Fisher Scoring for feature selection
 #' 
 #' @description This function computes the Fisher scoring for each feature 
-#' based on a binary output and ranks them in descending order.
+#' based on the binary version of the popularity labels ("non-popular" being 0 and "popular" being 1) 
+#' and ranks them in descending order.
 #' 
 #' @param features The dataframe containing the features.
-#' @param labels The categorical labels (in our case we have 5 categories) 
+#' @param labels The categorical labels (in our case we have 5 categories for popularity) 
 #' according to which you want to measure the variability of each feature.
 #' @param n The number of features with the highest score you want to select for your final model.
-#' @param threshold The value to use as the threshold for converting the label to binary.
+#' @param threshold The value to use as the threshold for converting the categorical labels to binary.
 #' @return A dataframe containing the selected features.
 #' @export
 #' @import assertthat

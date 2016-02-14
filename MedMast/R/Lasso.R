@@ -11,7 +11,7 @@
 #' @param type A string with values "select" for performing feature selection or "predict" for 
 #' predictions using Lasso (by default it is set to "select").
 #' @param test.features A dataframe containing the test dataset (NULL if type = "select").
-#' @param dfmax = An integer which, if not NULL, indicates how many features to be 
+#' @param dfmax An integer which, if not NULL, indicates how many features to be 
 #' extracted (NULL by default).
 #' @return If type = "select" the function returns a dataframe with the extracted features, 
 #' else if type = "predict" it returns the vector of predicted labels.
@@ -22,7 +22,7 @@
 #' # create sample dataset
 #' features <- matrix(rnorm(200), ncol=2)
 #' labels <- c(rep(1, 40), rep(2, 40), rep(3,40), rep(4, 40), rep(5,40))
-#' lasso.model(train.features = features, labels, type = "select", dfmax = 1)
+#' lasso.model(train.features = features, labels, type = "select", dfmax = 1) #this will select the most important feature in the dataset.
 
 lasso.model <- function(train.features, labels, type = "select", test.features = NULL, dfmax = NULL) {
   if(!require("assertthat")) install.packages("assertthat"); library(assertthat)

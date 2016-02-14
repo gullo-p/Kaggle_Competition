@@ -2,7 +2,7 @@
 % Please edit documentation in R/Fisher_scoring.R
 \name{fisher.selection}
 \alias{fisher.selection}
-\title{Fisher Scoring for feature selection.}
+\title{Fisher Scoring for feature selection}
 \usage{
 fisher.selection(features, labels, n, threshold)
 }

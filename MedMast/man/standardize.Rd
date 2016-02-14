@@ -2,7 +2,7 @@
 % Please edit documentation in R/Standardization.R
 \name{standardize}
 \alias{standardize}
-\title{Feature standardization.}
+\title{Feature standardization}
 \usage{
 standardize(x, type = "continuous")
 }

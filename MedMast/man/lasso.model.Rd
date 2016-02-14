@@ -2,7 +2,7 @@
 % Please edit documentation in R/Lasso.R
 \name{lasso.model}
 \alias{lasso.model}
-\title{Lasso model for feature selection and prediction.}
+\title{Lasso model for feature selection and prediction}
 \usage{
 lasso.model(train.features, labels, type = "select", test.features = NULL,
   dfmax = NULL)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/Submission.R
 \name{submit}
 \alias{submit}
-\title{Submission generator.}
+\title{Submission generator}
 \usage{
 submit(fit, sub_numb)
 }
