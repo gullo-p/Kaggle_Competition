@@ -33,7 +33,7 @@ handle.missing <- function(features,type){
     index2 <- match("global_subjectivity",colnames(features))
     # Recode the missing values
     features[features$n_tokens_content == 0,c(index1:(index1+4),(index1+7))] <- NA
-    features[features$global_subjectivity == 0,c(index2:(index2+10)] <- NA
+    features[features$global_subjectivity == 0,c(index2:(index2+10))] <- NA
     
     # Hot deck Imputation
     features <- impute.NN_HD(DATA=features,distance="eukl")
