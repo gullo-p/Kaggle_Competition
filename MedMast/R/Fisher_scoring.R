@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------------------------------------
 #' @title Fisher Scoring for feature selection.
 #' 
-#' This function computes the Fisher scoring for each feature 
+#' @description This function computes the Fisher scoring for each feature 
 #' based on a binary output and ranks them in descending order.
 #' 
 #' @param features The dataframe containing the features.
