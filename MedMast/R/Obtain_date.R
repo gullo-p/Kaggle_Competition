@@ -1,9 +1,12 @@
 # ----------------------------------------------------------------------------------------------------
-# Obtain the date
+# Obtaining date
 # ----------------------------------------------------------------------------------------------------
+#' Obtain the date
+#' 
 #' This function creates the variables year, month, day and date from the url of each news, 
 #' and also a variable called is.holiday which is a binary that checks if the date is among 
 #' the holiday's days.
+#' 
 #' @param dataset The Kaggle dataset comprising of training and test data.
 #' @return The updated dataset with year, month and is.holiday variables added.
 #' @export
