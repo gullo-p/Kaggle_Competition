@@ -188,7 +188,6 @@ cvfit = cv.glmnet(X, y, family="multinomial", type.multinomial = "grouped", dfma
 pfit = predict(cvfit, newx = test.clean, s = "lambda.min", type = "class")
 
 final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
-sum(pfit == final$popularity )/9644
 
 
 submit <- as.data.frame(cbind(c(30001:39644), pfit))  #CREATE A DIFFERENT SCRIPT JUST FOR THE SUBMISSION
@@ -209,7 +208,7 @@ train.clean = train.clean[,which(colnames(train.clean) %in% c(topvar,"popularity
 test.clean = features_clean[30001:39644,which(colnames(test.clean) %in% topvar)]
 
 real <- knn(train=train.clean[,-21], test = test.clean, cl = train.clean$popularity, k=20)
-sum(real == final$popularity )/9644
+
 ####################
 #CROSS VALIDATION
 
@@ -227,8 +226,6 @@ train_pred <- as.data.frame(train_pred)
 #compare the results with the truth
 result <- cbind(train_pred, train.testLabels)
 
-#rate of correctness
-sum(result$train_pred == train.testLabels)/10008
 
 test_stand <- as.data.frame(lapply(test[4:61], standardize))
 
