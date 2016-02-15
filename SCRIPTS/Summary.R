@@ -69,4 +69,3 @@ train.clean = train.clean[,which(colnames(train.clean) %in% c(topvar,"popularity
 test.clean = features_clean[30001:39644,which(colnames(test.clean) %in% topvar)]
 
 real <- knn(train=train.clean[,-21], test = test.clean, cl = train.clean$popularity, k=20)
-sum(real == final$popularity )/9644
