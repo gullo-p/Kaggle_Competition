@@ -170,11 +170,6 @@ real_train_pred <- as.data.frame(real_train_pred)
 
 final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
 
-#WE SHOULD REMOVE THIS LINE
-sum(real_train_pred == final$popularity )/9644
-
-
-
 #######################################################################
 #LASSO REGRESSION FOR BOTH PREDICTION AND FEATURE EXTRACTION (THIS CAN BE SAVED IN A DIFFERENT FILE)
 train.clean <- data.frame(features_clean,popularity = as.numeric(dataset$popularity))[1:30000,]
