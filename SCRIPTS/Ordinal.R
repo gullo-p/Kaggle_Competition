@@ -88,7 +88,6 @@ for(i in 1:30){
 }
 
 rfpred$prediction <- apply(rfpred[,-1],1,function(x) as.numeric(names(tail(sort(table(x)),1))))
-sum(rfpred$prediction == final$popularity)/9644
 
 plot(acc)
 
