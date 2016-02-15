@@ -16,8 +16,6 @@ fit <- res$class
 
 final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
 
-sum(fit== final$popularity )/9644 #50.22812 %
-
 # Now let's try with cleaned but not standardized data
 
 #FEATURE SELECTION (CREATE A DIFFERENT SCRIPT FOR FISHER SCORING)
@@ -59,6 +57,3 @@ adaboost <- boosting(popularity~., train.clean, boos=TRUE, mfinal = 6)
 res <- predict( adaboost, newdata=test.clean )
 
 fit <- res$class
-
-sum(fit== final$popularity )/9644  #50,17628 with 6 trees %
-
