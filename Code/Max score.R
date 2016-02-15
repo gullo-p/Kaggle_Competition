@@ -66,16 +66,6 @@ rf <- randomForest(x = train3[1:30000,3:n], y = labels[1:30000],
                    xtest = test3[,3:n],  ntree=100,nPerm=1,mtry=3,
                    proximity=TRUE,importance=TRUE, nodesize=20)
 
-pred <- rf$test$predicted
-sum(popularity$popularity == pred)/length(popularity$popularity)
-
-#3.000: 0.5061178
-#5.000: 0.5109913
-#10.000: 0.5157611
-
-round(prop.table(table(pred)) * 100, digits = 1)
-table(popularity$popularity,pred)
-
 
 submit <- as.data.frame(cbind(c(30001:39644), pred))
 names(submit) <- c("id", "popularity")
