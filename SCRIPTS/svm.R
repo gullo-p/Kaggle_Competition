@@ -1,7 +1,6 @@
 
 train <- read.csv("../DATA/news_popularity_training.csv", sep = ",")
 test <- read.csv("../DATA/news_popularity_test.csv", sep = ",")
-final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
 
 train <- train[,3:62]
 test <- test[, 3:61]
