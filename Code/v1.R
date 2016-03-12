@@ -5,9 +5,6 @@ library(class)
 train <- read.csv("../DATA/news_popularity_training.csv", sep = ",")
 test <- read.csv("../DATA/news_popularity_test.csv", sep = ",")
 
-#tables
-table(train$popularity)
-round(prop.table(table(train$popularity)) * 100, digits = 1)
 
 
 #STANDARDIZED VERSION  +  YEAR AND MONTH + HOLIDAY (THE ONE WHO WORKED BEST)
@@ -52,8 +49,6 @@ train_pred <- as.data.frame(train_pred)
 #compare the results with the truth
 result <- cbind(train_pred, train.testLabels)
 
-#rate of correctness
-sum(result$train_pred == train.testLabels)/10008
 
 test_stand <- as.data.frame(lapply(test[4:61], standardize))
 

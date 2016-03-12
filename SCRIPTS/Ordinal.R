@@ -34,7 +34,6 @@ time.data$ts <- as.numeric(731 - time.data$timedelta)
 #time.data$quarter <- cut(time.data$ts,breaks=8,labels=1:8)
 
 time.data$popularity <- factor(time.data$popularity, ordered = TRUE)
-final$popularity <- factor(final$popularity, ordered = TRUE)
 
 flag <- is.na(time.data$popularity)
 
@@ -88,7 +87,6 @@ for(i in 1:30){
 }
 
 rfpred$prediction <- apply(rfpred[,-1],1,function(x) as.numeric(names(tail(sort(table(x)),1))))
-sum(rfpred$prediction == final$popularity)/9644
 
 plot(acc)
 

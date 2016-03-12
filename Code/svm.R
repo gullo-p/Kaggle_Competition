@@ -15,7 +15,6 @@ head(res)
 
 fit <- signif(res, digits = 1)
 fit1 <- round(res)
-sum(fit1 == final$popularity )/9644 #51,33762, round in general works better than signif
 
 #svm with the raw data (no changes at all)
 model <- svm( train$popularity~., train )
@@ -23,7 +22,6 @@ res2 <- predict(model, newdata=as.matrix(test))
 fit2 <- signif(res2, digits = 1)
 fit3 <- round(res2)
 
-sum(fit3 == final$popularity)/9644 #51,47242 %
 
 
 #Last attempt: svm with selected features from LASSO
@@ -43,11 +41,10 @@ res4 <- predict(model3, newdata = as.matrix(test.clean))
 fit4 <- signif(res4, digits = 1)
 fit5 <- round(res4)
 
-sum(fit5 == final$popularity)/9644 #50,something % 
 
 #Final attempt: svm with selected features from Fisher Scoring
 model4 <- svm(train.clean$popularity~., train.clean)
 res5 <- predict(model4, newdata = as.matrix(test.clean))
 fit6 <- signif(res5, digits = 1)
 fit7 <- round(res5)
-sum(fit7 == final$popularity)/9644  #51,03691 %
+
