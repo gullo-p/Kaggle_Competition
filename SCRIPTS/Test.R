@@ -49,4 +49,4 @@ colnames(rf.predictions) <- c("id","popularity")
 
 #write.table(rf.predictions,"submitl.csv",sep=",",row.names = F)
 
-
+submit <- rf.predictions

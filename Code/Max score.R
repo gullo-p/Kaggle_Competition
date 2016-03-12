@@ -7,7 +7,7 @@ test3 <- read.csv("../DATA/news_popularity_test.csv", sep = ",")
 
 
 #Get the labels
-labels <- train3$popularity
+labels <- ifelse(train3$popularity == 1, 1, 0)
 labels <- as.factor(labels)
 train3$popularity <- NULL
 
@@ -58,15 +58,3 @@ test$news_category[which(test$data_channel_is_world == 1)]<-"World"
 train3$data_channel_is_other <- ifelse(train$news_category == "Other", 1, 0)
 test3$data_channel_is_other <- ifelse(test$news_category == "Other", 1, 0)
 
-
-
-#Random forest computation
-n <- ncol(train3)
-rf <- randomForest(x = train3[1:30000,3:n], y = labels[1:30000], 
-                   xtest = test3[,3:n],  ntree=100,nPerm=1,mtry=3,
-                   proximity=TRUE,importance=TRUE, nodesize=20)
-
-
-submit <- as.data.frame(cbind(c(30001:39644), pred))
-names(submit) <- c("id", "popularity")
-write.csv(submit, file = "submit11.csv", quote = FALSE, row.names = FALSE)
