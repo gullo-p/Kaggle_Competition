@@ -1,4 +1,4 @@
-
+library(e1071)
 train <- read.csv("../DATA/news_popularity_training.csv", sep = ",")
 test <- read.csv("../DATA/news_popularity_test.csv", sep = ",")
 final <- read.csv("/Users/guglielmo/Desktop/final_competition/final.csv", header = TRUE, sep = ",")
@@ -16,7 +16,7 @@ head(res)
 
 fit <- signif(res, digits = 1)
 fit1 <- round(res)
-sum(fit1 == final$popularity )/9644 #51,33762, round in general works better than signif
+sum(fit1 == final$popularity )/9644 # 51,33762, round in general works better than signif
 
 #svm with the raw data (no changes at all)
 model <- svm( train$popularity~., train )
@@ -24,7 +24,14 @@ res2 <- predict(model, newdata=as.matrix(test))
 fit2 <- signif(res2, digits = 1)
 fit3 <- round(res2)
 
+sum(rf.predictions[,2] ==final$popularity)/9644
 sum(fit3 == final$popularity)/9644 #51,47242 %
+table(rf.predictions[,2], final$popularity)
+table(rf.predictions[,2])
+table(fit3, final$popularity)
+a <- cbind(rf.predictions[,2],fit3)
+a$pred <- apply(a, 1, max)
+sum(a$pred == final$popularity)/9644
 
 
 #Last attempt: svm with selected features from LASSO
