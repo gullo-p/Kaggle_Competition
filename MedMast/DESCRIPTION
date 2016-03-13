@@ -16,3 +16,6 @@ Depends:
     glmnet, 
     HotDeckImputation,
     randomForest
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
