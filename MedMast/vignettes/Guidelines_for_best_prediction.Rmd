@@ -1,0 +1,80 @@
+---
+title: "Using MedMast package for predicting news popularity"
+author: "Anna Corretger, Santhosh Narayanan, Guglielmo Pelino"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+This vignette shows how to reproduce step by step our best prediction for the Kaggle competition using some of the functions in the package MedMast we created.
+
+## Data cleaning
+After having imported the training and test datasets in R and rbinded them in a single dataset (which we call `dataset`), we can start with the data cleaning.
+```{r, eval=FALSE}
+dataset <- rbind(train,test)
+
+# DATA CLEANING
+# remove outlier 
+dataset <- dataset[-which(train$n_unique_tokens == 701),]
+
+# Remove non-sense or redundant features: 
+# Remove the almost constant column
+dataset$n_non_stop_words <- NULL
+
+# # Remove the rate negative_words
+dataset$rate_negative_words <- NULL
+
+dataset$flag <- 0
+dataset$flag[is.na(dataset$popularity)] <- 1
+
+# order the dataset by date
+time.data <- dataset[order(dataset$timedelta,decreasing = TRUE),]
+time.data$ts <- as.numeric(731 - time.data$timedelta)
+```
+As shown also in the comments, the above code first removes the outlier present in `dataset` (see the Report.pdf file for more informations on it), then it removes the non-sense feature `n_non_stop_words` and `rate_negative_words` (which is fully determined by its complementary `rate_positive_words`).\
+Moreover, we initialize a flag for the test data (whose popularity is `NULL`), and we order `dataset` by date (the reason for this will be clear later on - again see Report.pdf for details).
+
+## Creation of new features
+In order to treat missing values we created a new binary feature (`missing.flag`) which flags for them in each observation, in the following way:
+```{r, eval = FALSE}
+# initialize a new feature which flags the missing values in the data
+time.data$missing.flag <- 0
+time.data$missing.flag[time.data$n_tokens_content == 0] <- 1
+time.data$missing.flag[time.data$global_subjectivity == 0] <- 1
+```
+Then, we created time-related features with the intent to exploit any possible dependence of popularity of certain types of news in different periods of the year.\
+For doing this, we directly use the function `obtain.date` in MedMast package, which takes as input our dataset and extracts the dates from the url's, thus returning the updated dataset with year, month and is.holiday variables (which is a binary equal to $1$ if the date was among the holidays and $0$ otherwise).\
+We also define the ```quarter``` variable for having more insight on possible seasonalities in the dynamics of news.
+```{r,eval = FALSE}
+library(MedMast)
+
+# add the date variables (year, month and is.holiday)
+time.data <- obtain.date(time.data)
+
+# add the quarter variable
+time.data$quarter <- cut(time.data$ts,breaks=8,labels=1:8)
+```
+
+## Final Model
+
+The final model uses again a function from MedMast, ```rolling.windows.rf```, which performs a random forest on the just created ```time.data``` dataframe with a rolling windows technique, i.e., the dataset is split in chunks of fixed size, were each chunk starts from the observation which follows the starting observation of the previous chunk (this is why is called rolling windows). In each split of the data we predict a portion of the test data labels through a random forest with $200$ trees. The final prediction is given then by a majority vote over all the predictions made.\
+For the analysis behind the choice of the model and optimization of parameters please again refer to Report.pdf file.\
+The code used is the following:
+```{r, eval = FALSE}
+# Convert the response to ordinal
+time.data$popularity <- factor(time.data$popularity, ordered = TRUE)
+
+library(MedMast)
+# PREDICTIONS
+rf.predictions <- rolling.windows.rf(dataset = time.data, ntree = 200)
+
+colnames(rf.predictions) <- c("id","popularity")
+
+#write the table in the correct form for the submission
+write.table(rf.predictions,"submitl.csv",sep=",",row.names = F)
+```
+
+
+
