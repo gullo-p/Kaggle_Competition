@@ -169,8 +169,8 @@ vec1 <- vec1[!vec1 %in% vr4]
 ################################################################################
 
 # Get vectors of words with higher frequencies
-vr2 <- names(head(sort(table(vec2),decreasing=TRUE), n = 6)) # freq > 10
-vr1 <- names(head(sort(table(vec1),decreasing=TRUE), n = 13)) # freq > 5
+vr2 <- names(head(sort(table(vec2),decreasing=TRUE), n = 6)) 
+vr1 <- names(head(sort(table(vec1),decreasing=TRUE), n = 3)) 
 
 # Remove frequent most frequent words per class
 vec3 <- vec3[!vec3 %in% vr2]
@@ -181,8 +181,8 @@ vec3 <- vec3[!vec3 %in% vr1]
 ################################################################################
 
 # Get vectors of words with higher frequencies
-vr3 <- names(head(sort(table(vec3),decreasing=TRUE), n = 3)) # freq > 10
-vr1 <- names(head(sort(table(vec1),decreasing=TRUE), n = 1)) # freq > 5
+vr3 <- names(head(sort(table(vec3),decreasing=TRUE), n = 3)) 
+vr1 <- names(head(sort(table(vec1),decreasing=TRUE), n = 2)) 
 
 # Remove frequent most frequent words per class
 vec2 <- vec2[!vec2 %in% vr3]
@@ -194,39 +194,31 @@ vec2 <- vec2[!vec2 %in% vr1]
 
 # Get vectors of words with higher frequencies
 vr3 <- names(head(sort(table(vec3),decreasing=TRUE), n = 1)) 
+vr2 <- names(head(sort(table(vec2),decreasing=TRUE), n = 4))
 
 # Remove frequent most frequent words per class
 vec1 <- vec1[!vec1 %in% vr3]
+vec1 <- vec1[!vec1 %in% vr2]
 
 
 # For class 3: remove low frequencies of other classes
 ################################################################################
 
-# Get vectors of words with higher frequencies
-vr2 <- names(head(sort(table(vec2),decreasing=FALSE), n = 12)) 
-vr1 <- names(head(sort(table(vec1),decreasing=FALSE), n = 1)) 
+# Get vectors of words with lower frequencies
+vr2 <- names(head(sort(table(vec2),decreasing=FALSE), n = 29)) 
+vr1 <- names(head(sort(table(vec1),decreasing=FALSE), n = 14)) 
 
 # Remove frequent most frequent words per class
 vec3 <- vec3[!vec3 %in% vr2]
 vec3 <- vec3[!vec3 %in% vr1]
 
 
-# For class 2: remove low frequencies of other classes
-################################################################################
-
-# Get vectors of words with higher frequencies
-vr3 <- names(head(sort(table(vec3),decreasing=FALSE), n = 1)) 
-
-# Remove frequent most frequent words per class
-vec2 <- vec2[!vec2 %in% vr3]
-
-
 # For class 1: remove low frequencies of other classes
 ################################################################################
 
 # Get vectors of words with higher frequencies
-vr3 <- names(head(sort(table(vec3),decreasing=FALSE), n = 8)) 
-vr2 <- names(head(sort(table(vec2),decreasing=FALSE), n = 4)) 
+vr3 <- names(head(sort(table(vec3),decreasing=FALSE), n = 11)) 
+vr2 <- names(head(sort(table(vec2),decreasing=FALSE), n = 1)) 
 
 # Remove frequent most frequent words per class
 vec1 <- vec1[!vec1 %in% vr3]
@@ -242,8 +234,8 @@ vr1 <- names(head(sort(table(vec1),decreasing=TRUE), n = 1))
 
 # Remove frequent most frequent words per class
 vec1 <- vec1[!vec1 %in% vr3]
+vec1 <- vec1[!vec1 %in% vr2]
 vec2 <- vec2[!vec2 %in% vr1]
-vec2 <- vec2[!vec2 %in% vr2]
 vec2 <- vec2[!vec2 %in% vr3]
 vec3 <- vec3[!vec3 %in% vr1]
 vec3 <- vec3[!vec3 %in% vr2]
@@ -253,9 +245,11 @@ vec3 <- vec3[!vec3 %in% vr2]
 
 # Get vectors of words with higher frequencies
 vr2 <- names(head(sort(table(vec2),decreasing=TRUE), n = 4)) 
+vr3 <- names(head(sort(table(vec3),decreasing=TRUE), n = 1))
 
 # Remove frequent most frequent words per class
 vec1 <- vec1[!vec1 %in% vr2]
+vec1 <- vec1[!vec1 %in% vr3]
 
 
 # Class 3: Assign higher probabilities
@@ -263,7 +257,7 @@ vec1 <- vec1[!vec1 %in% vr2]
 
 # Get vectors of words with higher frequencies
 vr2 <- names(head(sort(table(vec2),decreasing=TRUE)))[6] 
-vr1 <- names(head(sort(table(vec1),decreasing=TRUE), n= 20))[19] 
+vr1 <- names(head(sort(table(vec1),decreasing=TRUE)))[4]  
 
 # Remove frequent most frequent words per class
 vec1 <- vec1[!vec1 %in% vr2]
@@ -277,7 +271,7 @@ vec2 <- vec2[!vec2 %in% vr1]
 
 # Get vectors of words with higher frequencies
 vr3 <- names(head(sort(table(vec3),decreasing=TRUE)))[4]
-vr1 <- names(head(sort(table(vec1),decreasing=TRUE)))[2]
+vr1 <- names(head(sort(table(vec1),decreasing=TRUE)))[3]
 
 # Remove frequent most frequent words per class
 vec1 <- vec1[!vec1 %in% vr3]
@@ -306,9 +300,11 @@ vec3 <- vec3[!vec3 %in% vr3]
 
 # Get vectors of words with higher frequencies
 vr2 <- names(head(sort(table(vec2),decreasing=TRUE), n = 14)) 
+vr1 <- names(head(sort(table(vec1),decreasing=TRUE), n = 13)) 
 
 # Remove frequent most frequent words per class
 vec3 <- vec3[!vec3 %in% vr2]
+vec3 <- vec3[!vec3 %in% vr1]
 
 
 # For class 2: remove high frequencies of other classes
@@ -316,7 +312,7 @@ vec3 <- vec3[!vec3 %in% vr2]
 
 # Get vectors of words with higher frequencies
 vr3 <- names(head(sort(table(vec3),decreasing=TRUE), n = 3)) 
-vr1 <- names(head(sort(table(vec1),decreasing=TRUE), n = 1)) 
+vr1 <- names(head(sort(table(vec1),decreasing=TRUE), n = 2)) 
 
 # Remove frequent most frequent words per class
 vec2 <- vec2[!vec2 %in% vr3]
@@ -339,8 +335,8 @@ vec1 <- vec1[!vec1 %in% vr2]
 ################################################################################
 
 # Get vectors of words with higher frequencies
-vr2 <- names(head(sort(table(vec2),decreasing=FALSE), n = 12)) 
-vr1 <- names(head(sort(table(vec1),decreasing=FALSE), n = 30)) 
+vr2 <- names(head(sort(table(vec2),decreasing=FALSE), n = 29)) 
+vr1 <- names(head(sort(table(vec1),decreasing=FALSE), n = 44)) 
 
 # Remove frequent most frequent words per class
 vec3 <- vec3[!vec3 %in% vr2]
@@ -351,20 +347,22 @@ vec3 <- vec3[!vec3 %in% vr1]
 ################################################################################
 
 # Get vectors of words with higher frequencies
-vr3 <- names(head(sort(table(vec3),decreasing=FALSE), n = 1))
-vr1 <- names(head(sort(table(vec1),decreasing=FALSE), n = 1)) 
+vr3 <- names(head(sort(table(vec3),decreasing=FALSE), n = 2))
+vr1 <- names(head(sort(table(vec1),decreasing=FALSE), n = 3)) 
 
 # Remove frequent most frequent words per class
-vec2 <- vec2[!vec2 %in% vr3]
-vec2 <- vec2[!vec2 %in% vr1]
+vec3 <- vec3[!vec3 %in% vr3]
+vec3 <- vec3[!vec3 %in% vr1]
+vec1 <- vec1[!vec1 %in% vr3]
+vec1 <- vec1[!vec1 %in% vr1]
 
 
 # For class 1: remove low frequencies of other classes
 ################################################################################
 
 # Get vectors of words with higher frequencies
-vr3 <- names(head(sort(table(vec3),decreasing=FALSE), n = 22)) 
-vr2 <- names(head(sort(table(vec2),decreasing=FALSE), n = 4)) 
+vr3 <- names(head(sort(table(vec3),decreasing=FALSE), n = 11)) 
+vr2 <- names(head(sort(table(vec2),decreasing=FALSE), n = 1)) 
 
 # Remove frequent most frequent words per class
 vec1 <- vec1[!vec1 %in% vr3]
@@ -394,9 +392,9 @@ match(vc3, v3)
 match(vc2, v2)
 match(vc1, v1)
 
-#136
-#326
-#56
+#137
+#348
+#55
 #8
 
 # 491
