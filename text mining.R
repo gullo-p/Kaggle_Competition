@@ -31,14 +31,6 @@ for (i in 1:nrow(time.data)) {
   }
 }
 
-#Count number of words in url
-time.data$wordsUrl <- sapply(time.data$urll, 
-                             FUN=function(x) {as.numeric(length(unlist(strsplit(x, "-"))))})
-
-#max(time.data$countsDay) - min(time.data$countsDay)/3
-time.data$wordsUrl2 <- ifelse(time.data$wordsUrl < 7, 1,
-                              ifelse(time.data$wordsUrl < 13, 2,3))
-time.data$wordsUrl2 <- as.factor(time.data$wordsUrl2)
 
 # Convert from string to vector strings
 vec5 <- unlist(strsplit(vec5, "-"))
