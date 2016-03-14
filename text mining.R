@@ -1,9 +1,8 @@
 
 
 
-# Obtain vectors of words:
-
-#################
+# Obtain vectors of words: train
+################################################################################
 
 #Obtain vectors of words for train
 vec5 <- c()
@@ -58,8 +57,38 @@ vec3 <- vec3[!vec3 %in% prepositions]
 vec2 <- vec2[!vec2 %in% prepositions]
 vec1 <- vec1[!vec1 %in% prepositions]
 
+
+# Obtain vectors of words: test
+################################################################################
+
+vec <- c()
 #Get vector of all words of the test
-vec <- c(Tvec1,Tvec2, Tvec3, Tvec4, Tvec5)
+t <- time.data[time.data$flag == 1,]
+for (i in 1:nrow(t)) {
+  word <- t[i,'urll']
+  vec <- paste(vec, word, sep = "-")
+}
+# Convert from string to vector strings
+vec <- unlist(strsplit(vec, "-"))
+
+#Remove first element ""
+vec <- vec[-c(1)]
+
+# Remove the 4000 (10%) most popular words
+rep2 <- names(head(sort(table(vec),decreasing=TRUE), n  = 4000))
+vec <- vec[!vec %in% rep2]
+
+# Vector of letters
+prepositions <- c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j","k", "l", "m", "n", 
+                  "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
+
+#Remove words that are prepositions
+vec <- vec[!vec %in% prepositions]
+
+vec <- unique(vec)
+
+# Obtain vectors of words that are both in train and test
+################################################################################
 
 # Keep only those words which are also in the test
 tes <- Reduce(intersect, list(vec5,vec))
@@ -73,33 +102,14 @@ vec2 <- vec2[vec2 %in% tes]
 tes <- Reduce(intersect, list(vec1,vec))
 vec1 <- vec1[vec1 %in% tes]
 
-#Remove the numbers
-vec5 <- gsub(" [A-Za-z] ", "", gsub("[0-9]", "", vec5))
-vec5 <- vec5[vec5 != ""]
-vec4 <- gsub(" [A-Za-z] ", "", gsub("[0-9]", "", vec4))
-vec4 <- vec4[vec4 != ""]
-vec3 <- gsub(" [A-Za-z] ", "", gsub("[0-9]", "", vec3))
-vec3 <- vec3[vec3 != ""]
-vec2 <- gsub(" [A-Za-z] ", "", gsub("[0-9]", "", vec2))
-vec2 <- vec2[vec2 != ""]
-vec1 <- gsub(" [A-Za-z] ", "", gsub("[0-9]", "", vec1))
-vec1 <- vec1[vec1 != ""]
-
-#Get words repetead among all popularity
-repetits <- Reduce(intersect, list(vec5, vec4,vec3,vec2,vec1))
-
-#Remove words contained in the repetits vector
-vec5 <- vec5[!vec5 %in% repetits]
-vec4 <- vec4[!vec4 %in% repetits]
-vec3 <- vec3[!vec3 %in% repetits]
-vec2 <- vec2[!vec2 %in% repetits]
-vec1 <- vec1[!vec1 %in% repetits]
+# Clean the vectors
+################################################################################
 
 # Get vectors of most frequent elements  (most freq)
-vr5 <- names(head(sort(table(vec5),decreasing=TRUE), n  = 10)) #freq 1 class
-vr4 <- names(head(sort(table(vec4),decreasing=TRUE), n  = 28))  #freq  1 class
-vr3 <- names(head(sort(table(vec3),decreasing=TRUE), n  = 9)) #freq 2 class
-vr2 <- names(head(sort(table(vec2),decreasing=TRUE), n  = 1)) #freq 4 class
+vr5 <- names(head(sort(table(vec5),decreasing=TRUE), n  = 20)) 
+vr4 <- names(head(sort(table(vec4),decreasing=TRUE), n  = 25)) # 2 high classes
+vr3 <- names(head(sort(table(vec3),decreasing=TRUE), n  = 11)) # 2 high classes
+vr2 <- names(head(sort(table(vec2),decreasing=TRUE), n  = 2)) # 2 high classes
 
 # Remove frequent most frequent words per class
 vec5 <- vec5[!vec5 %in% vr5]
@@ -107,17 +117,6 @@ vec4 <- vec4[!vec4 %in% vr4]
 vec3 <- vec3[!vec3 %in% vr3]
 vec2 <- vec2[!vec2 %in% vr2]
 
-
-# Remove stop words
-################################################################################
-
-library(plyr)
-library(tm)
-stopWords <- stopwords("en")
-vec4 <- vec4[!vec4 %in% stopWords]
-vec3 <- vec3[!vec3 %in% stopWords]
-vec2 <- vec2[!vec2 %in% stopWords]
-vec1 <- vec1[!vec1 %in% stopWords]
 
 # Remove verbs
 ################################################################################
@@ -154,11 +153,12 @@ vec3 <- vec3[!vec3 %in% nouns]
 vec2 <- vec2[!vec2 %in% nouns]
 vec1 <- vec1[!vec1 %in% nouns]
 
+
 # Get the words with higher probabilities
 ################################################################################
 
 #Get words repetead among all popularity
-vr4 <- vec4[c(13, 32, 35, 45, 67, 72, 88, 127)]
+vr4 <- vec4[c(13, 33, 36, 47, 70, 76, 95, 138)]
 vec4 <- vec4[vec4 %in% vr4]
 vec3 <- vec3[!vec3 %in% vr4]
 vec2 <- vec2[!vec2 %in% vr4]
