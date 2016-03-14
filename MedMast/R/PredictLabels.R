@@ -3,22 +3,23 @@
 # ----------------------------------------------------------------------------------------------------
 #' @title Predict final labels through text mining
 #' 
-#' @description This function predicts the final popularity based on the strings contained in the different
-#' urls. It obtains the words that appear in both, train and test data, then it applies some common words
-#' removal (most common words in english, verbs, and adjectives) and finally, removal of those words that 
-#' appear in more than one class. After this, it returns a data frame containing all the test data
-#' and its predicted popularity (NA otherwise).  
+#' @description This function predicts the final popularity of some articles based on 
+#' the strings contained in the different url's. It obtains the words that appear 
+#' in both train and test data, then it applies some common words
+#' removal (most common words in english, verbs, and adjectives) and finally, removal of those 
+#' words that appear in more than one class. After this, it returns a data frame 
+#' containing all the test data and its predicted popularity (NA for the articles for which 
+#' prediction could not be made, as e.g., no matched words were found in the url's).  
 #' 
 #' @param time.data The dataframe containing the train and test data
 #' @return A dataframe containing the predictions (id and popularity)
 #' @export
-#' @import 
 #' @examples 
 #' # create sample dataset
 #' time.data <- dataset[order(dataset$timedelta,decreasing = TRUE),]
 #' # obtain the predicted popularity for the test data
 #' predictLabels(time.data)
-#' 
+
 predictLabels <- function(time.data) {
   
   # Obtain vectors of words: train
@@ -50,7 +51,7 @@ predictLabels <- function(time.data) {
     }
   }
   
-  
+
   # Convert from string to vector strings
   vec5 <- unlist(strsplit(vec5, "-"))[-1]
   vec4 <- unlist(strsplit(vec4, "-"))[-1]

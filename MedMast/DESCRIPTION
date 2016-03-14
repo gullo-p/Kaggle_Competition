@@ -15,7 +15,12 @@ Depends:
     assertthat,
     glmnet, 
     HotDeckImputation,
-    randomForest
+    randomForest,
+    e1071,
+    MASS,
+    ranger,
+    caret,
+    adabag
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

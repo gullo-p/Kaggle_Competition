@@ -10,11 +10,11 @@
 #' @param dataset A dataset comprising of training and test data
 #' @param window.size An integer which establishes the size of each chunk of the rolling windows.
 #' @param step.size An integer which defines the distance between the starting observations for two consecutive windows.
-#' @param seed The seed you want to set for the iterations of the random forest.
-#' @param ntree The number of trees in each call of random forest.
+#' @param FUN The function to which you want to apply the rolling window technique (can be one among the 
+#' other my.functions present in the package).
+#' 
 #' @return A dataframe containing the id's and the predicted labels in the right format for submission.
 #' @export
-#' @import randomForest
 #' @import assertthat
 
 rolling.windows <- function(dataset , window.size = 10000, step.size = 1000 ,FUN = my.forest ,...){
