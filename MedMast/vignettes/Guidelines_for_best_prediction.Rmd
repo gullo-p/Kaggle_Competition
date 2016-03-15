@@ -8,7 +8,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-This vignette shows how to reproduce step by step our best prediction for the Kaggle competition using some of the functions in the package MedMast we created.
+This vignette shows how to reproduce step by step our best prediction for the Kaggle competition using some of the functions in the package MedMast we created. The script to which this vignette refers to is Final.R, which is contained in the SCRIPTS folder in our github repo.
 
 ## Data cleaning
 After having imported the training and test datasets in R and rbinded them in a single dataset (which we call `dataset`), we can start with the data cleaning.
@@ -33,7 +33,8 @@ dataset$flag[is.na(dataset$popularity)] <- 1
 time.data <- dataset[order(dataset$timedelta,decreasing = TRUE),]
 time.data$ts <- as.numeric(731 - time.data$timedelta)
 ```
-As shown also in the comments, the above code first removes the outlier present in `dataset` (see the Report.pdf file for more informations on it), then it removes the non-sense feature `n_non_stop_words` and `rate_negative_words` (which is fully determined by its complementary `rate_positive_words`).\
+As shown also in the comments, the above code first removes the outlier present in `dataset` (see the Report.pdf file for more informations on it), then it removes the non-sense feature `n_non_stop_words` and `rate_negative_words` (which is fully determined by its complementary `rate_positive_words`).
+
 Moreover, we initialize a flag for the test data (whose popularity is `NULL`), and we order `dataset` by date (the reason for this will be clear later on - again see Report.pdf for details).
 
 ## Creation of new features
@@ -44,36 +45,126 @@ time.data$missing.flag <- 0
 time.data$missing.flag[time.data$n_tokens_content == 0] <- 1
 time.data$missing.flag[time.data$global_subjectivity == 0] <- 1
 ```
-Then, we created time-related features with the intent to exploit any possible dependence of popularity of certain types of news in different periods of the year.\
-For doing this, we directly use the function `obtain.date` in MedMast package, which takes as input our dataset and extracts the dates from the url's, thus returning the updated dataset with year, month and is.holiday variables (which is a binary equal to $1$ if the date was among the holidays and $0$ otherwise).\
-We also define the ```quarter``` variable for having more insight on possible seasonalities in the dynamics of news.
+
+Then, we created time-related features with the intent to exploit any possible dependence of popularity of certain types of news on different periods of the year.\
+For doing this, we used the function `obtain.date` in MedMast package, which takes as input our dataset and extracts the dates from the url's, thus returning the updated dataset with year, month and is.holiday variables (which is a binary equal to $1$ if the date was among the holidays and $0$ otherwise).
+
+We also define the ```day```, ```quarter``` and ```countsDay``` (which counts the number of articles published in the same day) variables for having more insights on possible seasonalities in the dynamics of news. 
 ```{r,eval = FALSE}
 library(MedMast)
+#Adding features
+##########################################################################################
 
 # add the date variables (year, month and is.holiday)
 time.data <- obtain.date(time.data)
 
+# add variable day
+time.data$day <- as.factor(substring(time.data$url, 29,30))
+
 # add the quarter variable
-time.data$quarter <- cut(time.data$ts,breaks=8,labels=1:8)
+time.data$quarter <- ifelse(time.data$month < 4, 1,
+                            ifelse(time.data$month < 7, 2,
+                                   ifelse(time.data$month < 10, 3,4)))
+# add how many articles in the same date
+time.data$countsDay <- ave(time.data$timedelta, time.data$timedelta, FUN = length)
+```
+
+Then we added variables concerning the data channels and the content of the articles: ```data_channel_is_other``` is a binary that takes value $1$ if the article is not belonging to any of the data channel already present in the dataset:
+```{r,eval=FALSE}
+# Add channel other
+time.data$data_channel_is_other <- ifelse(time.data$data_channel_is_lifestyle == 0 &
+                                            time.data$data_channel_is_entertainment == 0 &
+                                            time.data$data_channel_is_socmed == 0 &
+                                            time.data$data_channel_is_tech == 0 &
+                                            time.data$data_channel_is_world == 0, 1,0)
+```
+
+Finally, regarding the content of the article we constructed groups of possible topics (techBrands, gossip, politics, socialMedia, sports etc.) and created a binary for each of them, looking at the words in the url's.
+```{r,eval=FALSE}
+# New variables according to words in the url
+techBrands <- c("facebook|roomba|acer|google|3g|wikipedia|app|apple|ibm|ios|iphone
+                |blackberry|xbox|playstation|ipad|windows|dell|pc|samsung|microsoft
+                |lenovo|yahoo|asus|amazon|lg|gopro|hp|sony|bill-gates|htc|nintendo
+                |nokia|beatsvbing|bitcoin|imac|kindle|drone")
+
+gossip <- c("kyle|golden-globes|emmy|tom-cruise|megan-fox|celebrities|ryan-gosling
+            |avril-lavigne|prince|harry|ashton-kutcher|kanye|oscars|megan|steve
+            |john|zuckerberg|sex|oprah|angelina|katy-perry|lady-gaga|madonna
+            |beyonce|brittney|michael-jackson|oscar|ashley|kardashian|taylor-swift|
+            breaking-bad|justin-bieber|engagement|radcliffe|hollywood|teenage|proposal
+            |hillary")
+
+politics <- c("obama|militar|referendum|al-gore|cia|aids|fbi|washington|jihad|politic
+              |migration|nuclear|wealth|iran|ebola|war|nasa|clinton|cnn|senator|riot
+              |police|syria|bush|congress|usa|us-|russian|ukraine|protest|putin|
+              white-house|world-war|abortion|law|interpol|fbi|independence|
+              korea|europe|drugs|taliban|osama|marijuana|israel|conflict")
+
+socialMedia <- c("facebook|evernote|myspace|twitter|instagram|snapchat|uber|vine
+                 |youtube|tinder|pinterest|linkedin|airbnb|spotify|netflix|tumblr
+                 |shazam|foursquare") 
+
+sports <- c("cup|ping-pong|crossfit|olympics|scoccer|nhl|clippers|football|rugby|fifa
+            |suarez|skating|michael-jordan|ferguson|chelsea|nfl|messi|guardiola|baseball
+            |basket|nba|nfl|golf|tiger-woods|lebron-james")
+
+cars <- c("toyota|audi|super-bowl|car|aston-martin|mercedes|ford|nissan")
+
+tvShows <- c("star-trek|sitcom|hbo|armstrong|tv-premier|doctor-who|how-i-met-your-mother
+             |spoiler|tv-show|castle|season|thrones|true-blood|star-wars|potter|sons-of-anarchy
+             |superman|sherlock|walter-white")
+
+
+time.data$techBrands <- grepl(techBrands,time.data$url)
+time.data$politics <- grepl(politics,time.data$url)
+time.data$gossip <- grepl(gossip,time.data$url)
+time.data$socialMedia <- grepl(socialMedia,time.data$url)
+time.data$sports <- grepl(sports,time.data$url)
+time.data$cars <- grepl(cars,time.data$url)
+time.data$tvShows <- grepl(tvShows,time.data$url)
+
+time.data$isPopular <- ifelse(time.data$techBrands == 0 &
+                                time.data$politics == 0 &
+                                time.data$gossip == 0 &
+                                time.data$socialMedia == 0 &
+                                time.data$sports == 0 &
+                                time.data$cars == 0 &
+                                time.data$tvShows == 0, 0,1)
+
 ```
 
 ## Final Model
 
-The final model uses again a function from MedMast, ```rolling.windows.rf```, which performs a random forest on the just created ```time.data``` dataframe with a rolling windows technique, i.e., the dataset is split in chunks of fixed size, were each chunk starts from the observation which follows the starting observation of the previous chunk (this is why is called rolling windows). In each split of the data we predict a portion of the test data labels through a random forest with $200$ trees. The final prediction is given then by a majority vote over all the predictions made.\
+The final model uses two functions from MedMast, ```rolling.windows.rf``` and ```predictLabels```. The first one performs a random forest on the just created ```time.data``` dataframe with a rolling windows technique, i.e., the dataset is split in chunks of fixed size, were each chunk starts from the observation which follows the starting observation of the previous chunk. In each split of the data we predict a portion of the test data labels through a random forest with $200$ trees. The final prediction is given then by a majority vote over all the predictions made.\
+The second one, ```predictLabels``` instead performs a text mining kind of analysis on the words present in the url's 
+of each article, trying to identify words which could possibly spot popularity for certain articles.
+
+While the rolling windows technique allows us to get a prediction for each possible article, the second technique should 
+be seen just as a way to refine the first set of predictions, thanks to which we are able to change a very small portion 
+of predictions and yet get sensible improvements in the final accuracy.
+
 For the analysis behind the choice of the model and optimization of parameters please again refer to Report.pdf file.\
-The code used is the following:
+Here we restrict ourselves to just show the code used and in particular the functions called from MedMast package.
 ```{r, eval = FALSE}
-# Convert the response to ordinal
-time.data$popularity <- factor(time.data$popularity, ordered = TRUE)
-
-library(MedMast)
 # PREDICTIONS
-rf.predictions <- rolling.windows.rf(dataset = time.data, ntree = 200)
+##########################################################################################
 
-colnames(rf.predictions) <- c("id","popularity")
+# random forest with rolling windows
+rf.predictions2 <- rolling.windows.rf(dataset = time.data, ntree = 200)
 
-#write the table in the correct form for the submission
-write.table(rf.predictions,"submitl.csv",sep=",",row.names = F)
+colnames(rf.predictions2) <- c("id","popularity")
+
+# call the text mining function for getting some more predictions
+pred <- predictLabels(time.data)
+
+# merge the two predictions, i.e., substitute the new predictions obtained 
+#with predictLabels function
+submit <- merge(pred, rf.predictions2, by.x = "id", by.y = "id")
+submit$popularity <- ifelse(is.na(submit$popularity.x), submit$popularity.y,
+                            submit$popularity.x)
+
+submit$popularity.x <- NULL
+submit$popularity.y <- NULL
 ```
 
 

@@ -10,7 +10,7 @@
 
 <meta name="author" content="Anna Corretger, Santhosh Narayanan, Guglielmo Pelino" />
 
-<meta name="date" content="2016-03-13" />
+<meta name="date" content="2016-03-15" />
 
 <title>Using MedMast package for predicting news popularity</title>
 
@@ -54,11 +54,11 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Using MedMast package for predicting news popularity</h1>
 <h4 class="author"><em>Anna Corretger, Santhosh Narayanan, Guglielmo Pelino</em></h4>
-<h4 class="date"><em>2016-03-13</em></h4>
+<h4 class="date"><em>2016-03-15</em></h4>
 </div>
 
 
-<p>This vignette shows how to reproduce step by step our best prediction for the Kaggle competition using some of the functions in the package MedMast we created.</p>
+<p>This vignette shows how to reproduce step by step our best prediction for the Kaggle competition using some of the functions in the package MedMast we created. The script to which this vignette refers to is Final.R, which is contained in the SCRIPTS folder in our github repo.</p>
 <div id="data-cleaning" class="section level2">
 <h2>Data cleaning</h2>
 <p>After having imported the training and test datasets in R and rbinded them in a single dataset (which we call <code>dataset</code>), we can start with the data cleaning.</p>
@@ -81,7 +81,8 @@ dataset$flag[<span class="kw">is.na</span>(dataset$popularity)] &lt;-<span class
 <span class="co"># order the dataset by date</span>
 time.data &lt;-<span class="st"> </span>dataset[<span class="kw">order</span>(dataset$timedelta,<span class="dt">decreasing =</span> <span class="ot">TRUE</span>),]
 time.data$ts &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="dv">731</span> -<span class="st"> </span>time.data$timedelta)</code></pre>
-<p>As shown also in the comments, the above code first removes the outlier present in <code>dataset</code> (see the Report.pdf file for more informations on it), then it removes the non-sense feature <code>n_non_stop_words</code> and <code>rate_negative_words</code> (which is fully determined by its complementary <code>rate_positive_words</code>).<br />Moreover, we initialize a flag for the test data (whose popularity is <code>NULL</code>), and we order <code>dataset</code> by date (the reason for this will be clear later on - again see Report.pdf for details).</p>
+<p>As shown also in the comments, the above code first removes the outlier present in <code>dataset</code> (see the Report.pdf file for more informations on it), then it removes the non-sense feature <code>n_non_stop_words</code> and <code>rate_negative_words</code> (which is fully determined by its complementary <code>rate_positive_words</code>).</p>
+<p>Moreover, we initialize a flag for the test data (whose popularity is <code>NULL</code>), and we order <code>dataset</code> by date (the reason for this will be clear later on - again see Report.pdf for details).</p>
 </div>
 <div id="creation-of-new-features" class="section level2">
 <h2>Creation of new features</h2>
@@ -90,29 +91,106 @@ time.data$ts &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<s
 time.data$missing.flag &lt;-<span class="st"> </span><span class="dv">0</span>
 time.data$missing.flag[time.data$n_tokens_content ==<span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="dv">1</span>
 time.data$missing.flag[time.data$global_subjectivity ==<span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="dv">1</span></code></pre>
-<p>Then, we created time-related features with the intent to exploit any possible dependence of popularity of certain types of news in different periods of the year.<br />For doing this, we directly use the function <code>obtain.date</code> in MedMast package, which takes as input our dataset and extracts the dates from the url’s, thus returning the updated dataset with year, month and is.holiday variables (which is a binary equal to <span class="math">\(1\)</span> if the date was among the holidays and <span class="math">\(0\)</span> otherwise).<br />We also define the <code>quarter</code> variable for having more insight on possible seasonalities in the dynamics of news.</p>
+<p>Then, we created time-related features with the intent to exploit any possible dependence of popularity of certain types of news on different periods of the year.<br />For doing this, we used the function <code>obtain.date</code> in MedMast package, which takes as input our dataset and extracts the dates from the url’s, thus returning the updated dataset with year, month and is.holiday variables (which is a binary equal to <span class="math">\(1\)</span> if the date was among the holidays and <span class="math">\(0\)</span> otherwise).</p>
+<p>We also define the <code>day</code>, <code>quarter</code> and <code>countsDay</code> (which counts the number of articles published in the same day) variables for having more insights on possible seasonalities in the dynamics of news.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MedMast)
+<span class="co">#Adding features</span>
+##########################################################################################
 
 <span class="co"># add the date variables (year, month and is.holiday)</span>
 time.data &lt;-<span class="st"> </span><span class="kw">obtain.date</span>(time.data)
 
+<span class="co"># add variable day</span>
+time.data$day &lt;-<span class="st"> </span><span class="kw">as.factor</span>(<span class="kw">substring</span>(time.data$url, <span class="dv">29</span>,<span class="dv">30</span>))
+
 <span class="co"># add the quarter variable</span>
-time.data$quarter &lt;-<span class="st"> </span><span class="kw">cut</span>(time.data$ts,<span class="dt">breaks=</span><span class="dv">8</span>,<span class="dt">labels=</span><span class="dv">1</span>:<span class="dv">8</span>)</code></pre>
+time.data$quarter &lt;-<span class="st"> </span><span class="kw">ifelse</span>(time.data$month &lt;<span class="st"> </span><span class="dv">4</span>, <span class="dv">1</span>,
+                            <span class="kw">ifelse</span>(time.data$month &lt;<span class="st"> </span><span class="dv">7</span>, <span class="dv">2</span>,
+                                   <span class="kw">ifelse</span>(time.data$month &lt;<span class="st"> </span><span class="dv">10</span>, <span class="dv">3</span>,<span class="dv">4</span>)))
+<span class="co"># add how many articles in the same date</span>
+time.data$countsDay &lt;-<span class="st"> </span><span class="kw">ave</span>(time.data$timedelta, time.data$timedelta, <span class="dt">FUN =</span> length)</code></pre>
+<p>Then we added variables concerning the data channels and the content of the articles: <code>data_channel_is_other</code> is a binary that takes value <span class="math">\(1\)</span> if the article is not belonging to any of the data channel already present in the dataset:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Add channel other</span>
+time.data$data_channel_is_other &lt;-<span class="st"> </span><span class="kw">ifelse</span>(time.data$data_channel_is_lifestyle ==<span class="st"> </span><span class="dv">0</span> &amp;
+<span class="st">                                            </span>time.data$data_channel_is_entertainment ==<span class="st"> </span><span class="dv">0</span> &amp;
+<span class="st">                                            </span>time.data$data_channel_is_socmed ==<span class="st"> </span><span class="dv">0</span> &amp;
+<span class="st">                                            </span>time.data$data_channel_is_tech ==<span class="st"> </span><span class="dv">0</span> &amp;
+<span class="st">                                            </span>time.data$data_channel_is_world ==<span class="st"> </span><span class="dv">0</span>, <span class="dv">1</span>,<span class="dv">0</span>)</code></pre>
+<p>Finally, regarding the content of the article we constructed groups of possible topics (techBrands, gossip, politics, socialMedia, sports etc.) and created a binary for each of them, looking at the words in the url’s.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># New variables according to words in the url</span>
+techBrands &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;facebook|roomba|acer|google|3g|wikipedia|app|apple|ibm|ios|iphone</span>
+<span class="st">                |blackberry|xbox|playstation|ipad|windows|dell|pc|samsung|microsoft</span>
+<span class="st">                |lenovo|yahoo|asus|amazon|lg|gopro|hp|sony|bill-gates|htc|nintendo</span>
+<span class="st">                |nokia|beatsvbing|bitcoin|imac|kindle|drone&quot;</span>)
+
+gossip &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;kyle|golden-globes|emmy|tom-cruise|megan-fox|celebrities|ryan-gosling</span>
+<span class="st">            |avril-lavigne|prince|harry|ashton-kutcher|kanye|oscars|megan|steve</span>
+<span class="st">            |john|zuckerberg|sex|oprah|angelina|katy-perry|lady-gaga|madonna</span>
+<span class="st">            |beyonce|brittney|michael-jackson|oscar|ashley|kardashian|taylor-swift|</span>
+<span class="st">            breaking-bad|justin-bieber|engagement|radcliffe|hollywood|teenage|proposal</span>
+<span class="st">            |hillary&quot;</span>)
+
+politics &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;obama|militar|referendum|al-gore|cia|aids|fbi|washington|jihad|politic</span>
+<span class="st">              |migration|nuclear|wealth|iran|ebola|war|nasa|clinton|cnn|senator|riot</span>
+<span class="st">              |police|syria|bush|congress|usa|us-|russian|ukraine|protest|putin|</span>
+<span class="st">              white-house|world-war|abortion|law|interpol|fbi|independence|</span>
+<span class="st">              korea|europe|drugs|taliban|osama|marijuana|israel|conflict&quot;</span>)
+
+socialMedia &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;facebook|evernote|myspace|twitter|instagram|snapchat|uber|vine</span>
+<span class="st">                 |youtube|tinder|pinterest|linkedin|airbnb|spotify|netflix|tumblr</span>
+<span class="st">                 |shazam|foursquare&quot;</span>) 
+
+sports &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;cup|ping-pong|crossfit|olympics|scoccer|nhl|clippers|football|rugby|fifa</span>
+<span class="st">            |suarez|skating|michael-jordan|ferguson|chelsea|nfl|messi|guardiola|baseball</span>
+<span class="st">            |basket|nba|nfl|golf|tiger-woods|lebron-james&quot;</span>)
+
+cars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;toyota|audi|super-bowl|car|aston-martin|mercedes|ford|nissan&quot;</span>)
+
+tvShows &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;star-trek|sitcom|hbo|armstrong|tv-premier|doctor-who|how-i-met-your-mother</span>
+<span class="st">             |spoiler|tv-show|castle|season|thrones|true-blood|star-wars|potter|sons-of-anarchy</span>
+<span class="st">             |superman|sherlock|walter-white&quot;</span>)
+
+
+time.data$techBrands &lt;-<span class="st"> </span><span class="kw">grepl</span>(techBrands,time.data$url)
+time.data$politics &lt;-<span class="st"> </span><span class="kw">grepl</span>(politics,time.data$url)
+time.data$gossip &lt;-<span class="st"> </span><span class="kw">grepl</span>(gossip,time.data$url)
+time.data$socialMedia &lt;-<span class="st"> </span><span class="kw">grepl</span>(socialMedia,time.data$url)
+time.data$sports &lt;-<span class="st"> </span><span class="kw">grepl</span>(sports,time.data$url)
+time.data$cars &lt;-<span class="st"> </span><span class="kw">grepl</span>(cars,time.data$url)
+time.data$tvShows &lt;-<span class="st"> </span><span class="kw">grepl</span>(tvShows,time.data$url)
+
+time.data$isPopular &lt;-<span class="st"> </span><span class="kw">ifelse</span>(time.data$techBrands ==<span class="st"> </span><span class="dv">0</span> &amp;
+<span class="st">                                </span>time.data$politics ==<span class="st"> </span><span class="dv">0</span> &amp;
+<span class="st">                                </span>time.data$gossip ==<span class="st"> </span><span class="dv">0</span> &amp;
+<span class="st">                                </span>time.data$socialMedia ==<span class="st"> </span><span class="dv">0</span> &amp;
+<span class="st">                                </span>time.data$sports ==<span class="st"> </span><span class="dv">0</span> &amp;
+<span class="st">                                </span>time.data$cars ==<span class="st"> </span><span class="dv">0</span> &amp;
+<span class="st">                                </span>time.data$tvShows ==<span class="st"> </span><span class="dv">0</span>, <span class="dv">0</span>,<span class="dv">1</span>)</code></pre>
 </div>
 <div id="final-model" class="section level2">
 <h2>Final Model</h2>
-<p>The final model uses again a function from MedMast, <code>rolling.windows.rf</code>, which performs a random forest on the just created <code>time.data</code> dataframe with a rolling windows technique, i.e., the dataset is split in chunks of fixed size, were each chunk starts from the observation which follows the starting observation of the previous chunk (this is why is called rolling windows). In each split of the data we predict a portion of the test data labels through a random forest with <span class="math">\(200\)</span> trees. The final prediction is given then by a majority vote over all the predictions made.<br />For the analysis behind the choice of the model and optimization of parameters please again refer to Report.pdf file.<br />The code used is the following:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Convert the response to ordinal</span>
-time.data$popularity &lt;-<span class="st"> </span><span class="kw">factor</span>(time.data$popularity, <span class="dt">ordered =</span> <span class="ot">TRUE</span>)
+<p>The final model uses two functions from MedMast, <code>rolling.windows.rf</code> and <code>predictLabels</code>. The first one performs a random forest on the just created <code>time.data</code> dataframe with a rolling windows technique, i.e., the dataset is split in chunks of fixed size, were each chunk starts from the observation which follows the starting observation of the previous chunk. In each split of the data we predict a portion of the test data labels through a random forest with <span class="math">\(200\)</span> trees. The final prediction is given then by a majority vote over all the predictions made.<br />The second one, <code>predictLabels</code> instead performs a text mining kind of analysis on the words present in the url’s of each article, trying to identify words which could possibly spot popularity for certain articles.</p>
+<p>While the rolling windows technique allows us to get a prediction for each possible article, the second technique should be seen just as a way to refine the first set of predictions, thanks to which we are able to change a very small portion of predictions and yet get sensible improvements in the final accuracy.</p>
+<p>For the analysis behind the choice of the model and optimization of parameters please again refer to Report.pdf file.<br />Here we restrict ourselves to just show the code used and in particular the functions called from MedMast package.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># PREDICTIONS</span>
+##########################################################################################
 
-<span class="kw">library</span>(MedMast)
-<span class="co"># PREDICTIONS</span>
-rf.predictions &lt;-<span class="st"> </span><span class="kw">rolling.windows.rf</span>(<span class="dt">dataset =</span> time.data, <span class="dt">ntree =</span> <span class="dv">200</span>)
+<span class="co"># random forest with rolling windows</span>
+rf.predictions2 &lt;-<span class="st"> </span><span class="kw">rolling.windows.rf</span>(<span class="dt">dataset =</span> time.data, <span class="dt">ntree =</span> <span class="dv">200</span>)
 
-<span class="kw">colnames</span>(rf.predictions) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;id&quot;</span>,<span class="st">&quot;popularity&quot;</span>)
+<span class="kw">colnames</span>(rf.predictions2) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;id&quot;</span>,<span class="st">&quot;popularity&quot;</span>)
 
-<span class="co">#write the table in the correct form for the submission</span>
-<span class="kw">write.table</span>(rf.predictions,<span class="st">&quot;submitl.csv&quot;</span>,<span class="dt">sep=</span><span class="st">&quot;,&quot;</span>,<span class="dt">row.names =</span> F)</code></pre>
+<span class="co"># call the text mining function for getting some more predictions</span>
+pred &lt;-<span class="st"> </span><span class="kw">predictLabels</span>(time.data)
+
+<span class="co"># merge the two predictions, i.e., substitute the new predictions obtained </span>
+<span class="co">#with predictLabels function</span>
+submit &lt;-<span class="st"> </span><span class="kw">merge</span>(pred, rf.predictions2, <span class="dt">by.x =</span> <span class="st">&quot;id&quot;</span>, <span class="dt">by.y =</span> <span class="st">&quot;id&quot;</span>)
+submit$popularity &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(submit$popularity.x), submit$popularity.y,
+                            submit$popularity.x)
+
+submit$popularity.x &lt;-<span class="st"> </span><span class="ot">NULL</span>
+submit$popularity.y &lt;-<span class="st"> </span><span class="ot">NULL</span></code></pre>
 </div>
 
 
