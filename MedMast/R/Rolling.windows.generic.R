@@ -12,6 +12,7 @@
 #' @param step.size An integer which defines the distance between the starting observations for two consecutive windows.
 #' @param FUN The function to which you want to apply the rolling window technique (can be one among the 
 #' other my.functions present in the package).
+#' @param ... Additional parameter passed to FUN
 #' 
 #' @return A dataframe containing the id's and the predicted labels in the right format for submission.
 #' @export
@@ -27,9 +28,6 @@ rolling.windows <- function(dataset , window.size = 10000, step.size = 1000 ,FUN
   n <- nrow(dataset)
   iter <- round((n - window.size)/step.size,0)
   rwpred <- data.frame(id = dataset$id[dataset$flag == 1])
-  
-  # Initialize a vector for keeping track of the accuracy at each iteration
-  acc <- rep(0,iter)
   
   for(i in 1:iter){
     
@@ -57,6 +55,6 @@ rolling.windows <- function(dataset , window.size = 10000, step.size = 1000 ,FUN
   # Use the majority vote to arrive at final predictions
   rwpred$prediction <- apply(rwpred[,-1],1,function(x) as.numeric(names(tail(sort(table(x)),1))))
   
-  return(rwpred[,c("id","prediction")])
-  
+  #return the predictions from all windows
+  return(rwpred)
 }

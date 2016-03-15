@@ -20,7 +20,8 @@ Depends:
     MASS,
     ranger,
     caret,
-    adabag
+    adabag,
+    gbm
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

@@ -16,6 +16,8 @@ rolling.windows(dataset, window.size = 10000, step.size = 1000,
 
 \item{FUN}{The function to which you want to apply the rolling window technique (can be one among the 
 other my.functions present in the package).}
+
+\item{...}{Additional parameter passed to FUN}
 }
 \value{
 A dataframe containing the id's and the predicted labels in the right format for submission.

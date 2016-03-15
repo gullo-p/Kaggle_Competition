@@ -1,4 +1,7 @@
 # Random Forest: Tuning
+library(doMC)
+registerDoMC(cores = 2)
+
 require(caret)
 fitControl = trainControl(allowParallel = TRUE)
 
@@ -31,4 +34,30 @@ rf <- randomForest(formula = y ~ . , data = data,ntree = 400,
 df <- rf$err.rate
 
 qplot(x= 1:400 , y = df[,1] , geom = "point" , xlab = "Number of trees" , ylab = "Out of Bag error")
+
+
+set.seed(825)
+rfGrid <-  expand.grid(interaction.depth = 1:5,
+                       n.trees = seq(100,500,50),
+                       shrinkage = 0.1,
+                       n.minobsinnode = 10)
+
+fitControl = trainControl(allowParallel = TRUE)
+
+# Gradient Boosting: Tuning
+set.seed(1234)
+gbmFit1 <- train(y = y, x = x,
+                 method = "gbm",
+                 trControl = fitControl,
+                 tuneGrid = rfGrid,
+                 ## This last option is actually one
+                 ## for gbm() that passes through
+                 verbose = FALSE)
+gbmFit1
+
+set.seed(1234)
+adaFit1 <- train(y = y, x = x,
+                 method = "AdaBag",
+                 trControl = fitControl)
+adaFit1
 
