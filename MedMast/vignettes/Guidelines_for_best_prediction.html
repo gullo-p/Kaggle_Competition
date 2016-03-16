@@ -10,7 +10,7 @@
 
 <meta name="author" content="Anna Corretger, Santhosh Narayanan, Guglielmo Pelino" />
 
-<meta name="date" content="2016-03-15" />
+<meta name="date" content="2016-03-16" />
 
 <title>Using MedMast package for predicting news popularity</title>
 
@@ -54,11 +54,11 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Using MedMast package for predicting news popularity</h1>
 <h4 class="author"><em>Anna Corretger, Santhosh Narayanan, Guglielmo Pelino</em></h4>
-<h4 class="date"><em>2016-03-15</em></h4>
+<h4 class="date"><em>2016-03-16</em></h4>
 </div>
 
 
-<p>This vignette shows how to reproduce step by step our best prediction for the Kaggle competition using some of the functions in the package MedMast we created. The script to which this vignette refers to is Final.R, which is contained in the SCRIPTS folder in our github repo.</p>
+<p>This vignette shows how to reproduce step by step our best prediction for the Kaggle competition using some of the functions in the package MedMast we created. The script to which this vignette refers to is Master.R, which is contained in the SCRIPTS folder in our github repo.</p>
 <div id="data-cleaning" class="section level2">
 <h2>Data cleaning</h2>
 <p>After having imported the training and test datasets in R and rbinded them in a single dataset (which we call <code>dataset</code>), we can start with the data cleaning.</p>
@@ -169,28 +169,27 @@ time.data$isPopular &lt;-<span class="st"> </span><span class="kw">ifelse</span>
 </div>
 <div id="final-model" class="section level2">
 <h2>Final Model</h2>
-<p>The final model uses two functions from MedMast, <code>rolling.windows.rf</code> and <code>predictLabels</code>. The first one performs a random forest on the just created <code>time.data</code> dataframe with a rolling windows technique, i.e., the dataset is split in chunks of fixed size, were each chunk starts from the observation which follows the starting observation of the previous chunk. In each split of the data we predict a portion of the test data labels through a random forest with <span class="math">\(200\)</span> trees. The final prediction is given then by a majority vote over all the predictions made.<br />The second one, <code>predictLabels</code> instead performs a text mining kind of analysis on the words present in the url’s of each article, trying to identify words which could possibly spot popularity for certain articles.</p>
+<p>The final model uses two functions from MedMast, <code>rolling.windows</code> and <code>predictLabels</code>. The first one performs a random forest on the just created <code>time.data</code> dataframe with a rolling windows technique, i.e., the dataset is split in chunks of fixed size, were each chunk starts from the observation which follows the starting observation of the previous chunk. In each split of the data we predict a portion of the test data labels through a random forest with the tuned parameters. The final prediction is given then by a majority vote over all the predictions made.<br />The second one, <code>predictLabels</code> instead performs a text mining analysis on the words present in the url’s of each article, trying to identify words which could possibly spot popularity for certain articles.</p>
 <p>While the rolling windows technique allows us to get a prediction for each possible article, the second technique should be seen just as a way to refine the first set of predictions, thanks to which we are able to change a very small portion of predictions and yet get sensible improvements in the final accuracy.</p>
 <p>For the analysis behind the choice of the model and optimization of parameters please again refer to Report.pdf file.<br />Here we restrict ourselves to just show the code used and in particular the functions called from MedMast package.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># PREDICTIONS</span>
-##########################################################################################
+<span class="co"># Train and predict using random forest on Rolling windows</span>
+rf.predictions &lt;-<span class="st"> </span><span class="kw">rolling.windows</span>(<span class="dt">dataset =</span> time.data, <span class="dt">step.size =</span> <span class="dv">1000</span>,
+                                  <span class="dt">FUN =</span> my.forest, <span class="dt">ntree =</span> <span class="dv">300</span>, <span class="dt">mtry =</span> <span class="dv">4</span> )
 
-<span class="co"># random forest with rolling windows</span>
-rf.predictions2 &lt;-<span class="st"> </span><span class="kw">rolling.windows.rf</span>(<span class="dt">dataset =</span> time.data, <span class="dt">ntree =</span> <span class="dv">200</span>)
-
-<span class="kw">colnames</span>(rf.predictions2) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;id&quot;</span>,<span class="st">&quot;popularity&quot;</span>)
+rf.predictions &lt;-<span class="st"> </span>rf.predictions[,<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">32</span>)]
+<span class="kw">colnames</span>(rf.predictions) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;id&quot;</span>,<span class="st">&quot;popularity&quot;</span>)
 
 <span class="co"># call the text mining function for getting some more predictions</span>
 pred &lt;-<span class="st"> </span><span class="kw">predictLabels</span>(time.data)
 
-<span class="co"># merge the two predictions, i.e., substitute the new predictions obtained </span>
-<span class="co">#with predictLabels function</span>
-submit &lt;-<span class="st"> </span><span class="kw">merge</span>(pred, rf.predictions2, <span class="dt">by.x =</span> <span class="st">&quot;id&quot;</span>, <span class="dt">by.y =</span> <span class="st">&quot;id&quot;</span>)
-submit$popularity &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(submit$popularity.x), submit$popularity.y,
-                            submit$popularity.x)
+<span class="co"># merge the two predictions </span>
+final.prediction &lt;-<span class="st"> </span><span class="kw">merge</span>(pred, rf.predictions, <span class="dt">by.x =</span> <span class="st">&quot;id&quot;</span>, <span class="dt">by.y =</span> <span class="st">&quot;id&quot;</span>)
+final.prediction$popularity &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(final.prediction$popularity.x), 
+                                      final.prediction$popularity.y, final.prediction$popularity.x)
 
-submit$popularity.x &lt;-<span class="st"> </span><span class="ot">NULL</span>
-submit$popularity.y &lt;-<span class="st"> </span><span class="ot">NULL</span></code></pre>
+final.prediction$popularity.x &lt;-<span class="st"> </span><span class="ot">NULL</span>
+final.prediction$popularity.y &lt;-<span class="st"> </span><span class="ot">NULL</span></code></pre>
 </div>
 
 

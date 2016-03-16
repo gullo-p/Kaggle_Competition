@@ -8,7 +8,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-This vignette shows how to reproduce step by step our best prediction for the Kaggle competition using some of the functions in the package MedMast we created. The script to which this vignette refers to is Final.R, which is contained in the SCRIPTS folder in our github repo.
+This vignette shows how to reproduce step by step our best prediction for the Kaggle competition using some of the functions in the package MedMast we created. The script to which this vignette refers to is Master.R, which is contained in the SCRIPTS folder in our github repo.
 
 ## Data cleaning
 After having imported the training and test datasets in R and rbinded them in a single dataset (which we call `dataset`), we can start with the data cleaning.
@@ -135,37 +135,30 @@ time.data$isPopular <- ifelse(time.data$techBrands == 0 &
 
 ## Final Model
 
-The final model uses two functions from MedMast, ```rolling.windows.rf``` and ```predictLabels```. The first one performs a random forest on the just created ```time.data``` dataframe with a rolling windows technique, i.e., the dataset is split in chunks of fixed size, were each chunk starts from the observation which follows the starting observation of the previous chunk. In each split of the data we predict a portion of the test data labels through a random forest with $200$ trees. The final prediction is given then by a majority vote over all the predictions made.\
-The second one, ```predictLabels``` instead performs a text mining kind of analysis on the words present in the url's 
-of each article, trying to identify words which could possibly spot popularity for certain articles.
+The final model uses two functions from MedMast, ```rolling.windows``` and ```predictLabels```. The first one performs a random forest on the just created ```time.data``` dataframe with a rolling windows technique, i.e., the dataset is split in chunks of fixed size, were each chunk starts from the observation which follows the starting observation of the previous chunk. In each split of the data we predict a portion of the test data labels through a random forest with the tuned parameters. The final prediction is given then by a majority vote over all the predictions made.\
+The second one, ```predictLabels``` instead performs a text mining analysis on the words present in the url's of each article, trying to identify words which could possibly spot popularity for certain articles.
 
-While the rolling windows technique allows us to get a prediction for each possible article, the second technique should 
-be seen just as a way to refine the first set of predictions, thanks to which we are able to change a very small portion 
-of predictions and yet get sensible improvements in the final accuracy.
+While the rolling windows technique allows us to get a prediction for each possible article, the second technique should be seen just as a way to refine the first set of predictions, thanks to which we are able to change a very small portion of predictions and yet get sensible improvements in the final accuracy.
 
 For the analysis behind the choice of the model and optimization of parameters please again refer to Report.pdf file.\
 Here we restrict ourselves to just show the code used and in particular the functions called from MedMast package.
 ```{r, eval = FALSE}
 # PREDICTIONS
-##########################################################################################
+# Train and predict using random forest on Rolling windows
+rf.predictions <- rolling.windows(dataset = time.data, step.size = 1000,
+                                  FUN = my.forest, ntree = 300, mtry = 4 )
 
-# random forest with rolling windows
-rf.predictions2 <- rolling.windows.rf(dataset = time.data, ntree = 200)
-
-colnames(rf.predictions2) <- c("id","popularity")
+rf.predictions <- rf.predictions[,c(1,32)]
+colnames(rf.predictions) <- c("id","popularity")
 
 # call the text mining function for getting some more predictions
 pred <- predictLabels(time.data)
 
-# merge the two predictions, i.e., substitute the new predictions obtained 
-#with predictLabels function
-submit <- merge(pred, rf.predictions2, by.x = "id", by.y = "id")
-submit$popularity <- ifelse(is.na(submit$popularity.x), submit$popularity.y,
-                            submit$popularity.x)
+# merge the two predictions 
+final.prediction <- merge(pred, rf.predictions, by.x = "id", by.y = "id")
+final.prediction$popularity <- ifelse(is.na(final.prediction$popularity.x), 
+                                      final.prediction$popularity.y, final.prediction$popularity.x)
 
-submit$popularity.x <- NULL
-submit$popularity.y <- NULL
+final.prediction$popularity.x <- NULL
+final.prediction$popularity.y <- NULL
 ```
-
-
-

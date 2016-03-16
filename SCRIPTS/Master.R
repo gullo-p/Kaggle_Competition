@@ -110,14 +110,12 @@ time.data$isPopular <- ifelse(time.data$techBrands == 0 &
                                 time.data$cars == 0 &
                                 time.data$tvShows == 0, 0,1)
 
-##################
 # PREDICTIONS
 ##########################################################################################
 # Train and predict using random forest on Rolling windows
 rf.predictions <- rolling.windows(dataset = time.data, step.size = 1000,
                                   FUN = my.forest, ntree = 300, mtry = 4 )
 
-###############################################
 rf.predictions <- rf.predictions[,c(1,32)]
 colnames(rf.predictions) <- c("id","popularity")
 
