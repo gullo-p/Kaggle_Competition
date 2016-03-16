@@ -20,7 +20,7 @@ other my.functions present in the package).}
 \item{...}{Additional parameter passed to FUN}
 }
 \value{
-A dataframe containing the id's and the predicted labels in the right format for submission.
+A dataframe containing the id's and the predicted.
 }
 \description{
 This function fits a desired model with a rolling windows technique, i.e., 

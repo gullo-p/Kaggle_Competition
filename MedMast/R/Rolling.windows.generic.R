@@ -14,7 +14,7 @@
 #' other my.functions present in the package).
 #' @param ... Additional parameter passed to FUN
 #' 
-#' @return A dataframe containing the id's and the predicted labels in the right format for submission.
+#' @return A dataframe containing the id's and the predicted.
 #' @export
 #' @import assertthat
 

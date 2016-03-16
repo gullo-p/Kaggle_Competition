@@ -5,7 +5,7 @@
 \title{Rolling windows with random forest}
 \usage{
 rolling.windows.rf(dataset, window.size = 10000, step.size = 1000,
-  seed = 1234, ntree = 300)
+  seed = 1234, mtry = 4, ntree = 300)
 }
 \arguments{
 \item{dataset}{A dataset comprising of training and test data}
@@ -19,10 +19,10 @@ rolling.windows.rf(dataset, window.size = 10000, step.size = 1000,
 \item{ntree}{The number of trees in each call of random forest.}
 }
 \value{
-A dataframe containing the id's and the predicted labels in the right format for submission.
+A list containing the overall train and test accuaracies including the window-wise values.
 }
 \description{
-This function performs random forest with a rolling windows technique, i.e., 
+This function performs tuning of the rolling windows technique, i.e., 
 the dataset is split in chunks of fixed size, were each chunk starts from the observation
 which follows the starting observation of the previous chunk 
 (this is why is called rolling windows).

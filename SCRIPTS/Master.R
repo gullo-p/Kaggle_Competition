@@ -52,7 +52,7 @@ time.data$countsDay <- ave(time.data$timedelta, time.data$timedelta, FUN = lengt
 
 
 # Convert the response to ordinal
-time.data$popularity <- factor(time.data$popularity, ordered = TRUE)
+time.data$popularity <- factor(time.data$popularity)
 
 
 # Add channel other
@@ -63,7 +63,7 @@ time.data$data_channel_is_other <- ifelse(time.data$data_channel_is_lifestyle ==
                                             time.data$data_channel_is_world == 0, 1,0)
 
 
-
+#0.5350
 
 
 # New variables according to words in the url
@@ -88,7 +88,7 @@ sports <- c("cup|ping-pong|crossfit|olympics|scoccer|nhl|clippers|football|rugby
             |skating|michael-jordan|ferguson|chelsea|nfl|messi|guardiola|baseball|basket|nba|nfl|golf|
             tiger-woods|lebron-james")
 
-cars <- c("toyota|audi|super-bowl|car|aston-martin|mercedes|ford|nissan")
+cars <- c("toyota|audi|car")
 
 tvShows <- c("star-trek|sitcom|hbo|armstrong|tv-premier|doctor-who|how-i-met-your-mother|spoiler|
              tv-show|castle|season|thrones|true-blood|star-wars|potter|sons-of-anarchy|superman|sherlock|walter-white")
@@ -110,36 +110,26 @@ time.data$isPopular <- ifelse(time.data$techBrands == 0 &
                                 time.data$cars == 0 &
                                 time.data$tvShows == 0, 0,1)
 
-
+##################
 # PREDICTIONS
 ##########################################################################################
-
+# Train and predict using random forest on Rolling windows
 rf.predictions <- rolling.windows(dataset = time.data, step.size = 1000,
                                   FUN = my.forest, ntree = 300, mtry = 4 )
 
-mean(rf.predictions$prediction == final$popularity)
-
-gbm.predictions <- rolling.windows(dataset = time.data, step.size = 3000,
-                                   FUN = my.gbm)
-
-mean(gbm.predictions$prediction == final$popularity)
-
-agg.predictions <- cbind(rf.predictions[,-32],gbm.predictions[,-c(1,12)])
-agg.predictions$prediction <- apply(agg.predictions[,-1],1,function(x) as.numeric(names(tail(sort(table(x)),1))))
-
-agg.predictions <- agg.predictions[,c(1,42)]
-colnames(agg.predictions) <- c("id","popularity")
-
-mean(agg.predictions$prediction == final$popularity)
+###############################################
+rf.predictions <- rf.predictions[,c(1,32)]
+colnames(rf.predictions) <- c("id","popularity")
 
 # call the text mining function for getting some more predictions
 pred <- predictLabels(time.data)
 
 # merge the two predictions 
-final.prediction <- merge(pred, agg.predictions, by.x = "id", by.y = "id")
+final.prediction <- merge(pred, rf.predictions, by.x = "id", by.y = "id")
 final.prediction$popularity <- ifelse(is.na(final.prediction$popularity.x), 
                                       final.prediction$popularity.y, final.prediction$popularity.x)
 
-mean(final.prediction$popularity == final$popularity)
+final.prediction$popularity.x <- NULL
+final.prediction$popularity.y <- NULL
 
 write.table(final.prediction,"submit.csv",sep=",",row.names = F)
