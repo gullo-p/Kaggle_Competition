@@ -67,19 +67,31 @@ time.data$data_channel_is_other <- ifelse(time.data$data_channel_is_lifestyle ==
 
 
 # New variables according to words in the url
-techBrands <- c("facebook|roomba|acer|google|3g|wikipedia|app|apple|ibm|ios|iphone|blackberry|xbox|playstation|ipad|windows|dell|pc|samsung|microsoft|lenovo|yahoo|asus|amazon|lg|gopro|hp|sony|bill-gates|htc|nintendo|nokia|beatsvbing|bitcoin|imac|kindle|drone")
+techBrands <- c("facebook|roomba|acer|google|3g|wikipedia|app|apple|ibm|ios|iphone|blackberry|xbox|playstation|
+                ipad|windows|dell|pc|samsung|microsoft|lenovo|yahoo|asus|amazon|lg|gopro|hp|sony|bill-gates|htc
+                |nintendo|nokia|beatsvbing|bitcoin|imac|kindle|drone")
 
-gossip <- c("kyle|golden-globes|emmy|tom-cruise|megan-fox|celebrities|ryan-gosling|avril-lavigne|prince|harry|ashton-kutcher|kanye|oscars|megan|steve|john|zuckerberg|sex|oprah|angelina|katy-perry|lady-gaga|madonna|beyonce|brittney|michael-jackson|oscar|ashley|kardashian|taylor-swift|breaking-bad|justin-bieber|engagement|radcliffe|hollywood|teenage|proposal|hillary")
+gossip <- c("kyle|golden-globes|emmy|tom-cruise|megan-fox|celebrities|ryan-gosling|avril-lavigne|prince
+            |harry|ashton-kutcher|kanye|oscars|megan|steve|john|zuckerberg|sex|oprah|angelina|katy-perry
+            |lady-gaga|madonna|beyonce|brittney|michael-jackson|oscar|ashley|kardashian|taylor-swift|
+            breaking-bad|justin-bieber|engagement|radcliffe|hollywood|teenage|proposal|hillary")
 
-politics <- c("obama|militar|referendum|al-gore|cia|aids|fbi|washington|jihad|politic|migration|nuclear|wealth|iran|ebola|war|nasa|clinton|cnn|senator|riot|police|syria|bush|congress|usa|us-|russian|ukraine|protest|putin|white-house|world-war|abortion|law|interpol|fbi|independence|korea|europe|drugs|taliban|osama|marijuana|israel|conflict")
+politics <- c("obama|militar|referendum|al-gore|cia|aids|fbi|washington|jihad|politic|migration
+              |nuclear|wealth|iran|ebola|war|nasa|clinton|cnn|senator|riot|police|syria|bush|congress
+              |usa|us-|russian|ukraine|protest|putin|white-house|world-war|abortion|law|interpol|fbi|independence|
+              korea|europe|drugs|taliban|osama|marijuana|israel|conflict")
 
-socialMedia <- c("facebook|evernote|myspace|twitter|instagram|snapchat|uber|vine|youtube|tinder|pinterest|linkedin|airbnb|spotify|netflix|tumblr|shazam|foursquare") 
+socialMedia <- c("facebook|evernote|myspace|twitter|instagram|snapchat|uber|vine|youtube|tinder
+                 |pinterest|linkedin|airbnb|spotify|netflix|tumblr|shazam|foursquare") 
 
-sports <- c("cup|ping-pong|crossfit|olympics|scoccer|nhl|clippers|football|rugby|fifa|suarez|skating|michael-jordan|ferguson|chelsea|nfl|messi|guardiola|baseball|basket|nba|nfl|golf|tiger-woods|lebron-james")
+sports <- c("cup|ping-pong|crossfit|olympics|scoccer|nhl|clippers|football|rugby|fifa|suarez
+            |skating|michael-jordan|ferguson|chelsea|nfl|messi|guardiola|baseball|basket|nba|nfl|golf|
+            tiger-woods|lebron-james")
 
 cars <- c("toyota|audi|car")
 
-tvShows <- c("star-trek|sitcom|hbo|armstrong|tv-premier|doctor-who|how-i-met-your-mother|spoiler|tv-show|castle|season|thrones|true-blood|star-wars|potter|sons-of-anarchy|superman|sherlock|walter-white")
+tvShows <- c("star-trek|sitcom|hbo|armstrong|tv-premier|doctor-who|how-i-met-your-mother|spoiler|
+             tv-show|castle|season|thrones|true-blood|star-wars|potter|sons-of-anarchy|superman|sherlock|walter-white")
 
 
 time.data$techBrands <- grepl(techBrands,time.data$url)
